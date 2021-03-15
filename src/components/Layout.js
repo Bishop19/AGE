@@ -22,10 +22,10 @@ const Inside = styled(Box)({
   },
 });
 
-const Layout = ({ children }) => {
+const Layout = ({ auth, onLogout, children }) => {
   return (
     <>
-      <Header />
+      <Header auth={auth} onLogout={onLogout} />
       <Content>
         <Inside>{children}</Inside>
       </Content>
@@ -35,6 +35,11 @@ const Layout = ({ children }) => {
 };
 
 Layout.propTypes = {
+  auth: PropTypes.oneOfType([
+    PropTypes.string, // token
+    PropTypes.bool, // no auth token (false)
+  ]),
+  onLogout: PropTypes.func,
   children: PropTypes.node.isRequired,
 };
 
