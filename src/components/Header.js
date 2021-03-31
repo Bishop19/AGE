@@ -1,9 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { AppBar, Toolbar, Button, Grid } from "@material-ui/core";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useHistory } from "react-router-dom";
 
 const Header = ({ auth, onLogout }) => {
+  const history = useHistory();
+
   const account_btns = (
     <>
       <Grid item>
@@ -27,6 +29,11 @@ const Header = ({ auth, onLogout }) => {
     </>
   );
 
+  const handleLogout = () => {
+    history.push("/");
+    onLogout();
+  };
+
   return (
     <AppBar position="sticky">
       <Toolbar>
@@ -35,7 +42,7 @@ const Header = ({ auth, onLogout }) => {
         </Button>
 
         <Grid container justify="flex-end">
-          {auth ? <Button onClick={onLogout}>Logout</Button> : account_btns}
+          {auth ? <Button onClick={handleLogout}>Logout</Button> : account_btns}
         </Grid>
       </Toolbar>
     </AppBar>
