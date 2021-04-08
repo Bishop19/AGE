@@ -6,30 +6,70 @@ import theme from "./../theme";
 import { withRouter } from "react-router";
 import Header from "./Header";
 import Footer from "./Footer";
+import Menu from "./Menu";
+import clsx from "clsx";
+import { makeStyles } from "@material-ui/core/styles";
 
 const Content = styled(Box)({
-  minHeight: "calc(100vh - 112px)",
   backgroundColor: theme.palette.background.root,
-  "@media (min-width: 600px)": {
-    minHeight: "calc(100vh - 128px)",
-  },
+  minHeight: "calc(100vh - 128px)",
+  paddingTop: 64,
 });
 
 const Inside = styled(Box)({
-  padding: "20px 15% 50px 15%",
-  "@media (max-width: 600px)": {
-    padding: "20px 5% 50px 5%",
-  },
+  padding: "20px 10% 40px 10%",
 });
 
+const useStyles = makeStyles((theme) => ({
+  drawerOpen: {
+    marginLeft: 240,
+    transition: theme.transitions.create("margin-left", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  drawerClose: {
+    marginLeft: 55,
+    transition: theme.transitions.create("margin-left", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+}));
+
 const Layout = ({ auth, onLogout, children }) => {
+  const classes = useStyles();
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+
   return (
     <>
-      <Header auth={auth} onLogout={onLogout} />
+      <Header
+        auth={auth}
+        onLogout={onLogout}
+        onOpen={handleDrawerOpen}
+        open={open}
+      />
       <Content>
-        <Inside>{children}</Inside>
+        {auth && <Menu onClose={handleDrawerClose} open={open} />}
+        <Inside
+          className={clsx({
+            [classes.drawerOpen]: open,
+            [classes.drawerClose]: !open,
+          })}
+        >
+          {children}
+        </Inside>
       </Content>
-      <Footer />
+      {!auth && <Footer />}
     </>
   );
 };
