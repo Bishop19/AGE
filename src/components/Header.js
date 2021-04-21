@@ -8,6 +8,10 @@ import { makeStyles } from "@material-ui/core/styles";
 /* ICONS */
 import MenuIcon from "@material-ui/icons/Menu";
 
+/* Toaster */
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -68,45 +72,63 @@ const Header = ({ auth, onLogout, onOpen, open }) => {
   };
 
   return (
-    <AppBar
-      position="fixed"
-      className={clsx(classes.appBar, {
-        [classes.appBarShift]: open,
-      })}
-    >
-      <Toolbar>
-        {auth ? (
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={onOpen}
-            edge="start"
-            className={clsx(classes.menuButton, {
-              [classes.hide]: open,
-            })}
-          >
-            <MenuIcon />
-          </IconButton>
-        ) : (
-          <Button component={RouterLink} to="/">
-            NAVBAR
-          </Button>
-        )}
-
-        <Grid container justify="flex-end">
-          {auth ? <Button onClick={handleLogout}>Logout</Button> : account_btns}
-        </Grid>
-      </Toolbar>
-    </AppBar>
+    <>
+      <AppBar
+        position="fixed"
+        className={clsx(classes.appBar, {
+          [classes.appBarShift]: open,
+        })}
+      >
+        <Toolbar>
+          {auth ? (
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={onOpen}
+              edge="start"
+              className={clsx(classes.menuButton, {
+                [classes.hide]: open,
+              })}
+            >
+              <MenuIcon />
+            </IconButton>
+          ) : (
+            <Button component={RouterLink} to="/">
+              NAVBAR
+            </Button>
+          )}
+          <Grid container justify="flex-end">
+            {auth ? (
+              <Button onClick={handleLogout}>Logout</Button>
+            ) : (
+              account_btns
+            )}
+          </Grid>
+        </Toolbar>
+      </AppBar>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+    </>
   );
 };
+
+export default Header;
+
+/* Proptypes */
 
 Header.propTypes = {
   auth: PropTypes.oneOfType([
     PropTypes.string, // token
     PropTypes.bool, // no auth token (false)
-  ]),
-  onLogout: PropTypes.func,
+  ]).isRequired,
+  onLogout: PropTypes.func.isRequired,
+  onOpen: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
 };
-
-export default Header;

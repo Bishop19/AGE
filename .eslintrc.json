@@ -15,7 +15,8 @@
   "plugins": ["react"],
   "rules": {
     "no-unused-vars": "warn",
-    "react/prop-types": "warn"
+    "react/prop-types": "warn",
+    "react/no-unescaped-entities": 0
   },
   "settings": {
     "react": {

@@ -9,7 +9,7 @@ const theme = createMuiTheme({
       light: "#00AFF9",
       main: "#0089C3",
       dark: "#0079AD",
-      contrastText: "#1B3242",
+      contrastText: "#fff",
     },
     secondary: {
       light: "#294B63",
@@ -31,7 +31,7 @@ const theme = createMuiTheme({
   overrides: {
     MuiButton: {
       root: {
-        borderRadius: 50,
+        borderRadius: 15,
         margin: "8px",
       },
       outlined: {

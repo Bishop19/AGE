@@ -11,10 +11,14 @@ import ProtectedRoute from "./components/ProtectedRouter";
 import Landing from "./containers/Landing";
 import Login from "./containers/authentication/Login";
 import Signup from "./containers/authentication/Signup";
+import Dashboard from "./containers/Dashboard";
+import Config from "./containers/configuration/Config";
+import ConfigNew from "./containers/configuration/ConfigNew";
+import ConfigList from "./containers/configuration/ConfigList";
+import CloudList from "./containers/cloud/CloudList";
 
 /* Services */
 import AuthService from "./services/auth.service";
-import Dashboard from "./containers/Dashboard";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -43,13 +47,8 @@ const App = () => {
           <Layout auth={auth} onLogout={handlerLogout}>
             <Switch>
               <Route exact path="/">
-                <Landing />
+                {auth ? <Redirect to="/dashboard" /> : <Landing />}
               </Route>
-              <ProtectedRoute
-                path="/dashboard"
-                auth={auth}
-                component={Dashboard}
-              ></ProtectedRoute>
               <Route path="/login">
                 {auth ? (
                   <Redirect to="/dashboard" />
@@ -64,6 +63,31 @@ const App = () => {
                   <Signup onSignup={handlerLogin} />
                 )}
               </Route>
+              <ProtectedRoute
+                path="/dashboard"
+                auth={auth}
+                component={Dashboard}
+              ></ProtectedRoute>
+              <ProtectedRoute
+                path="/configs/new"
+                auth={auth}
+                component={ConfigNew}
+              ></ProtectedRoute>
+              <ProtectedRoute
+                path="/configs/:id"
+                auth={auth}
+                component={Config}
+              ></ProtectedRoute>
+              <ProtectedRoute
+                path="/configs"
+                auth={auth}
+                component={ConfigList}
+              ></ProtectedRoute>
+              <ProtectedRoute
+                path="/clouds"
+                auth={auth}
+                component={CloudList}
+              ></ProtectedRoute>
             </Switch>
           </Layout>
         </BrowserRouter>

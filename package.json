@@ -17,6 +17,7 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
+    "react-toastify": "^7.0.3",
     "web-vitals": "^1.0.1",
     "yup": "^0.32.9"
   },
@@ -35,7 +36,8 @@
     ],
     "rules": {
       "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn"
+      "react-hooks/exhaustive-deps": "warn",
+      "no-unused-vars": 0
     }
   },
   "browserslist": {

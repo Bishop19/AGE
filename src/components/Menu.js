@@ -1,4 +1,6 @@
 import React from "react";
+import PropTypes from "prop-types";
+import clsx from "clsx";
 import {
   Drawer,
   Divider,
@@ -9,13 +11,14 @@ import {
   ListItemText,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import clsx from "clsx";
 import { NavLink } from "react-router-dom";
 
 /* ICONS */
-import InboxIcon from "@material-ui/icons/MoveToInbox";
-import MailIcon from "@material-ui/icons/Mail";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import DashboardIcon from "@material-ui/icons/Dashboard";
+import BuildIcon from "@material-ui/icons/Build";
+import AssessmentIcon from "@material-ui/icons/Assessment";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import CloudIcon from "@material-ui/icons/Cloud";
 
 const drawerWidth = 240;
 
@@ -48,6 +51,17 @@ const useStyles = makeStyles((theme) => ({
     // necessary for content to be below app bar
     ...theme.mixins.toolbar,
   },
+  active: {
+    fontWeight: "bold",
+    color: theme.palette.primary.main,
+    "& .icon": {
+      color: theme.palette.primary.dark,
+    },
+  },
+  colors: {
+    backgroundColor: theme.palette.secondary.main,
+    color: theme.palette.secondary.contrastText,
+  },
 }));
 
 const Menu = ({ onClose, open }) => {
@@ -61,7 +75,7 @@ const Menu = ({ onClose, open }) => {
         [classes.drawerClose]: !open,
       })}
       classes={{
-        paper: clsx({
+        paper: clsx(classes.colors, {
           [classes.drawerOpen]: open,
           [classes.drawerClose]: !open,
         }),
@@ -69,25 +83,57 @@ const Menu = ({ onClose, open }) => {
     >
       <div className={classes.toolbar}>
         <IconButton onClick={onClose}>
-          <ChevronRightIcon />
+          <ChevronLeftIcon />
         </IconButton>
       </div>
       <Divider />
       <List>
-        <ListItem button component={NavLink} to="/dashboard">
+        <ListItem
+          button
+          component={NavLink}
+          to="/dashboard"
+          activeClassName={classes.active}
+        >
           <ListItemIcon>
-            <InboxIcon />
+            <DashboardIcon className="icon" />
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItem>
       </List>
       <Divider />
       <List>
-        <ListItem button component={NavLink} to="/configs">
+        <ListItem
+          button
+          component={NavLink}
+          to="/configs"
+          activeClassName={classes.active}
+        >
           <ListItemIcon>
-            <MailIcon />
+            <BuildIcon className="icon" />
           </ListItemIcon>
-          <ListItemText primary="Configs" />
+          <ListItemText primary="Configurations" />
+        </ListItem>
+        <ListItem
+          button
+          component={NavLink}
+          to="/clouds"
+          activeClassName={classes.active}
+        >
+          <ListItemIcon>
+            <CloudIcon className="icon" />
+          </ListItemIcon>
+          <ListItemText primary="Clouds" />
+        </ListItem>
+        <ListItem
+          button
+          component={NavLink}
+          to="/results"
+          activeClassName={classes.active}
+        >
+          <ListItemIcon>
+            <AssessmentIcon className="icon" />
+          </ListItemIcon>
+          <ListItemText primary="Results" />
         </ListItem>
       </List>
     </Drawer>
@@ -95,3 +141,10 @@ const Menu = ({ onClose, open }) => {
 };
 
 export default Menu;
+
+/* Proptypes */
+
+Menu.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
+};
