@@ -1,0 +1,4 @@
+[MASTER]
+load-plugins=pylint_flask_sqlalchemy, pylint_flask
+disable=C0114,C0115,C0116,C0412,W0107,R0401,W0702
+ignored-classes=SQLObject,Registrant,scoped_session
