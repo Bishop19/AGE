@@ -5,6 +5,7 @@ from app.controllers.errors import error_response
 from app.models.config import Config
 from app.models.endpoint import Endpoint
 from app.models.user import User
+from app.models.cloud import Cloud
 
 
 @app.route("/configurations", methods=["GET"])
@@ -48,10 +49,14 @@ def create_config():
         return error_response(400, "Endpoints are missing.")
 
     gateways = data.get("gateways", None)
-    print("gateways", gateways)
 
     if not gateways or len(gateways) == 0:
         return error_response(400, "Gateways are missing.")
+
+    cloud_ids = data.get("clouds", None)
+
+    if not cloud_ids:
+        return error_response(400, "Clouds are missing.")
 
     # Create config and endpoints
     config = Config(gateways=gateways, user_id=user_id)
@@ -65,6 +70,15 @@ def create_config():
                 payload=endpoint_data.get("payload", None),
             )
             config.endpoints.append(endpoint)
+        except:
+            return error_response(400, "Wrong parameters provided")
+
+    for cloud_id in cloud_ids:
+        try:
+            cloud = Cloud.query.get(cloud_id)
+            if not cloud:
+                raise Exception()
+            config.clouds.append(cloud)
         except:
             return error_response(400, "Wrong parameters provided")
 

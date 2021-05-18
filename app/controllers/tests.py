@@ -49,7 +49,13 @@ def create_test(config_id):
     if not user:
         return error_response(401, "Unauthorized")
 
-    # Create config and endpoints
+    # Verify running tests
+    test = Test.query.filter_by(config_id=config_id, is_finished=False).first()
+
+    if test:
+        return error_response(400, "One test already running")
+
+    # Create test
     test = Test(is_finished=False, config_id=config_id)
 
     db.session.add(test)
@@ -122,17 +128,76 @@ def edit_test(config_id, test_id):
     data = request.get_json() or {}
 
     for result in data.get("results", None):
-        # try:
-        r = Result(
-            gateway=result["gateway"],
-            score=result["score"],
-            metrics=result["metrics"],
-        )
-        test.results.append(r)
-    # except:
-    # return error_response(400, "Wrong parameters provided")
+        try:
+            r = Result(
+                gateway=result["gateway"],
+                score=result["score"],
+                metrics=result["metrics"],
+            )
+            test.results.append(r)
+        except:
+            return error_response(400, "Wrong parameters provided")
 
     db.session.add(test)
     db.session.commit()
 
     return jsonify(test.to_dict())
+
+
+@app.route("/configurations/<int:config_id>/tests/running", methods=["GET"])
+@jwt_required()
+def get_running_test(config_id):
+    # Check user
+    user_id = get_jwt_identity()["id"]
+
+    user = User.query.get(user_id)
+
+    if not user:
+        return error_response(401, "Unauthorized")
+
+    # Get config
+    config = Config.query.get(config_id)
+
+    if not config:
+        return error_response(404, "Config not found")
+
+    if config.user_id != user_id:
+        return error_response(401, "Unauthorized")
+
+    # Get running test
+    test = config.tests.filter_by(is_finished=False).first()
+
+    if not test:
+        return jsonify({"config": False})
+
+    return jsonify(test.to_dict())
+
+
+@app.route("/configurations/<int:config_id>/tests/finished", methods=["GET"])
+@jwt_required()
+def get_finished_tests(config_id):
+    # Check user
+    user_id = get_jwt_identity()["id"]
+
+    user = User.query.get(user_id)
+
+    if not user:
+        return error_response(401, "Unauthorized")
+
+    # Get config
+    config = Config.query.get(config_id)
+
+    if not config:
+        return error_response(404, "Config not found")
+
+    if config.user_id != user_id:
+        return error_response(401, "Unauthorized")
+
+    # Get finished tests
+    res = []
+    tests = config.tests.filter_by(is_finished=True).all()
+
+    for test in tests:
+        res.append(test.to_dict())
+
+    return jsonify(res)

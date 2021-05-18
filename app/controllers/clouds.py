@@ -35,8 +35,25 @@ def create_cloud():
     if not user:
         return error_response(401, "Unauthorized")
 
-    cloud = Cloud()
-    user.cloud.append(cloud)
+    data = request.get_json() or {}
+
+    name = data.get("name", None)
+
+    if not name:
+        return error_response(400, "Wrong parameters provided")
+
+    key = data.get("key", None)
+
+    if not key:
+        return error_response(400, "Wrong parameters provided")
+
+    provider = data.get("provider", None)
+
+    if not provider:
+        return error_response(400, "Wrong parameters provided")
+
+    cloud = Cloud(name=name, key=key, provider=provider.upper())
+    user.clouds.append(cloud)
 
     db.session.add(user)
     db.session.commit()
