@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import { Box, Button, Card, Chip, Grid, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { Link as RouterLink } from "react-router-dom";
-import Status from "../../components/Status";
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { Box, Button, Card, Chip, Grid, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import { Link as RouterLink } from 'react-router-dom';
+import Status from '../../components/Status';
 
 /* Icons */
-import AddIcon from "@material-ui/icons/Add";
-import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
-import RoomIcon from "@material-ui/icons/Room";
-import InputIcon from "@material-ui/icons/Input";
-import CloudIcon from "@material-ui/icons/Cloud";
+import AddIcon from '@material-ui/icons/Add';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+import RoomIcon from '@material-ui/icons/Room';
+import InputIcon from '@material-ui/icons/Input';
+import CloudIcon from '@material-ui/icons/Cloud';
+import configsService from '../../services/configs.service';
 
 const NoConfigs = () => {
   return (
@@ -23,7 +24,7 @@ const NoConfigs = () => {
       alignItems="center"
       textAlign="center"
     >
-      <InfoOutlinedIcon style={{ fontSize: "180px" }} color="disabled" />
+      <InfoOutlinedIcon style={{ fontSize: '180px' }} color="disabled" />
       <Typography variant="h5" color="textSecondary">
         No configurations. To create one, click on the "NEW" button.
       </Typography>
@@ -33,7 +34,7 @@ const NoConfigs = () => {
 
 const useCardStyles = makeStyles((theme) => ({
   card: {
-    "&:hover": {
+    '&:hover': {
       boxShadow: `0px 2px 4px -1px rgb(0 0 0 / 30%), 
         0px 4px 5px 0px rgb(0 0 0 / 30%), 
         0px 1px 10px 0px rgb(0 0 12 / 30%)`,
@@ -45,7 +46,7 @@ const ConfigCard = ({ config }) => {
   const classes = useCardStyles();
 
   return (
-    <RouterLink to={`/configs/${config.id}`} style={{ textDecoration: "none" }}>
+    <RouterLink to={`/configs/${config.id}`} style={{ textDecoration: 'none' }}>
       <Card elevation={4} className={classes.card}>
         <Box padding={2} display="flex" justifyContent="space-between">
           <Typography variant="h5">
@@ -56,15 +57,15 @@ const ConfigCard = ({ config }) => {
         <Box display="flex" paddingLeft={2} paddingBottom={1}>
           <Box flexGrow={1} display="flex" alignItems="center">
             <RoomIcon></RoomIcon>
-            <Box pl={1}>Endpoints</Box>
+            <Box pl={1}>{config.endpoints.length}</Box>
           </Box>
           <Box flexGrow={1} display="flex" alignItems="center">
             <InputIcon></InputIcon>
-            <Box pl={1}>Gateways</Box>
+            <Box pl={1}>{config.gateways.length}</Box>
           </Box>
           <Box flexGrow={1} display="flex" alignItems="center">
             <CloudIcon></CloudIcon>
-            <Box pl={1}>Clouds</Box>
+            <Box pl={1}>{config.clouds.length}</Box>
           </Box>
         </Box>
       </Card>
@@ -90,7 +91,7 @@ const ConfigList = () => {
   const [configurations, setConfigurations] = useState([]);
   useEffect(() => {
     const fetchConfigs = async () => {
-      const configs = []; // TODO
+      const configs = await configsService.getConfigs();
       setConfigurations(configs);
     };
 
@@ -100,10 +101,10 @@ const ConfigList = () => {
   // TODO - Remove this
   const addDummyConfig = () => {
     setConfigurations([
-      { id: 1, name: "Teste", state: "Running" },
-      { id: 2, name: "teste 2", state: "Finished" },
-      { id: 3, name: "teste 3", state: "No results" },
-      { id: 4, name: "teste 4", state: "Error" },
+      { id: 1, name: 'Teste', state: 'Running' },
+      { id: 2, name: 'teste 2', state: 'Finished' },
+      { id: 3, name: 'teste 3', state: 'No results' },
+      { id: 4, name: 'teste 4', state: 'Error' },
     ]);
   };
 

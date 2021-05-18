@@ -1,24 +1,26 @@
-import React, { useState, useEffect } from "react";
-import { ThemeProvider } from "@material-ui/core/styles";
-import theme from "./theme";
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { ThemeProvider } from '@material-ui/core/styles';
+import theme from './theme';
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 
 /* Components */
-import Layout from "./components/Layout";
-import ProtectedRoute from "./components/ProtectedRouter";
+import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRouter';
 
 /* Containers */
-import Landing from "./containers/Landing";
-import Login from "./containers/authentication/Login";
-import Signup from "./containers/authentication/Signup";
-import Dashboard from "./containers/Dashboard";
-import Config from "./containers/configuration/Config";
-import ConfigNew from "./containers/configuration/ConfigNew";
-import ConfigList from "./containers/configuration/ConfigList";
-import CloudList from "./containers/cloud/CloudList";
+import Landing from './containers/Landing';
+import Login from './containers/authentication/Login';
+import Signup from './containers/authentication/Signup';
+import Dashboard from './containers/Dashboard';
+import Config from './containers/configuration/Config';
+import ConfigNew from './containers/configuration/ConfigNew';
+import ConfigList from './containers/configuration/ConfigList';
+import Cloud from './containers/cloud/Cloud';
+import CloudNew from './containers/cloud/CloudNew';
+import CloudList from './containers/cloud/CloudList';
 
 /* Services */
-import AuthService from "./services/auth.service";
+import AuthService from './services/auth.service';
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -82,6 +84,16 @@ const App = () => {
                 path="/configs"
                 auth={auth}
                 component={ConfigList}
+              ></ProtectedRoute>
+              <ProtectedRoute
+                path="/clouds/new"
+                auth={auth}
+                component={CloudNew}
+              ></ProtectedRoute>
+              <ProtectedRoute
+                path="/clouds/:id"
+                auth={auth}
+                component={Cloud}
               ></ProtectedRoute>
               <ProtectedRoute
                 path="/clouds"

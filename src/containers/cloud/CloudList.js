@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import { Box, Button, Typography, Card, Grid } from "@material-ui/core";
-import { Link as RouterLink } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { Box, Button, Typography, Card, Grid } from '@material-ui/core';
+import { Link as RouterLink } from 'react-router-dom';
 
 /* Icons */
-import AddIcon from "@material-ui/icons/Add";
-import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
+import AddIcon from '@material-ui/icons/Add';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+import cloudsService from '../../services/clouds.service';
 
 const NoClouds = () => {
   return (
@@ -18,7 +19,7 @@ const NoClouds = () => {
       alignItems="center"
       textAlign="center"
     >
-      <InfoOutlinedIcon style={{ fontSize: "180px" }} color="disabled" />
+      <InfoOutlinedIcon style={{ fontSize: '180px' }} color="disabled" />
       <Typography variant="h5" color="textSecondary">
         No cloud projects. To create one, click on the "NEW" button.
       </Typography>
@@ -28,7 +29,7 @@ const NoClouds = () => {
 
 const CloudCard = ({ cloud }) => {
   return (
-    <RouterLink to={`/clouds/${cloud.id}`} style={{ textDecoration: "none" }}>
+    <RouterLink to={`/clouds/${cloud.id}`} style={{ textDecoration: 'none' }}>
       <Card>
         <Box p={2}>
           <Typography variant="h5">
@@ -56,7 +57,7 @@ const CloudList = () => {
   const [clouds, setClouds] = useState([]);
   useEffect(() => {
     const fetchClouds = async () => {
-      const clouds = []; // TODO
+      const clouds = await cloudsService.getClouds();
       setClouds(clouds);
     };
 
@@ -65,7 +66,7 @@ const CloudList = () => {
 
   // TODO - Remove this
   const addDummyCloud = () => {
-    setClouds([{ id: 1, name: "Teste" }]);
+    setClouds([{ id: 1, name: 'Teste' }]);
   };
 
   return (

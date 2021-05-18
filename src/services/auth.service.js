@@ -1,19 +1,18 @@
-import axios from "axios";
+import axios from 'axios';
 
-const IDENTITY_API_URL = process.env.REACT_APP_IDENTITY_API_URL;
-const API_KEY = process.env.REACT_APP_API_KEY;
+const API_URL = process.env.REACT_APP_API_URL;
 
-const signup = (email, password) => {
+const signup = (email, password, first_name, last_name) => {
   return axios
-    .post(`${IDENTITY_API_URL}:signUp?key=${API_KEY}`, {
+    .post(`${API_URL}/register`, {
       email,
       password,
-      returnSecureToken: true,
+      first_name,
+      last_name,
     })
     .then((response) => {
-      localStorage.setItem("token", response.data.idToken);
-      localStorage.setItem("refresh_token", response.data.refreshToken);
-      return response.data.idToken;
+      localStorage.setItem('token', response.data.access_token);
+      return response.data.access_token;
     })
     .catch((error) => {
       console.error(error);
@@ -23,15 +22,13 @@ const signup = (email, password) => {
 
 const login = (email, password) => {
   return axios
-    .post(`${IDENTITY_API_URL}:signInWithPassword?key=${API_KEY}`, {
+    .post(`${API_URL}/auth`, {
       email,
       password,
-      returnSecureToken: true,
     })
     .then((response) => {
-      localStorage.setItem("token", response.data.idToken);
-      localStorage.setItem("refresh_token", response.data.refreshToken);
-      return response.data.idToken;
+      localStorage.setItem('token', response.data.access_token);
+      return response.data.access_token;
     })
     .catch((error) => {
       console.error(error);
@@ -40,13 +37,12 @@ const login = (email, password) => {
 };
 
 const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("refresh_token");
+  localStorage.removeItem('token');
   return false;
 };
 
 const getCurrentUser = async () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem('token');
   return token;
 };
 

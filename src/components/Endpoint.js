@@ -1,24 +1,24 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
-import { Box } from "@material-ui/core";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { Box } from '@material-ui/core';
 
 const Endpoint = ({ path, params, method }) => {
   const getBackgroundColor = () => {
     switch (method.toUpperCase()) {
-      case "GET":
-        return "#3097ff";
-      case "POST":
-        return "#49cc90";
-      case "PATCH":
-        return "#fca130";
-      case "PUT":
-        return "#fca130";
-      case "DELETE":
-        return "#f93e3e";
-      case "OPTIONS":
-        return "#1745ff";
-      case "HEAD":
-        return "#1745ff";
+      case 'GET':
+        return '#3097ff';
+      case 'POST':
+        return '#49cc90';
+      case 'PATCH':
+        return '#fca130';
+      case 'PUT':
+        return '#fca130';
+      case 'DELETE':
+        return '#f93e3e';
+      case 'OPTIONS':
+        return '#1745ff';
+      case 'HEAD':
+        return '#1745ff';
     }
   };
 
@@ -36,12 +36,13 @@ const Endpoint = ({ path, params, method }) => {
       borderRadius="10px"
       border="black 1px solid"
       padding="10px"
+      bgcolor="white"
     >
       <Box
         display="flex"
         alignItems="center"
         onClick={handleClick}
-        style={{ cursor: "pointer" }}
+        style={{ cursor: 'pointer' }}
       >
         <Box flexGrow="1">{path}</Box>
         <Box

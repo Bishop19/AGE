@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import clsx from "clsx";
-import { toast } from "react-toastify";
-import { useHistory } from "react-router";
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import clsx from 'clsx';
+import { toast } from 'react-toastify';
+import { useHistory } from 'react-router';
+import { Link as RouterLink } from 'react-router-dom';
 
 /* Material UI */
 import {
@@ -12,21 +13,25 @@ import {
   Grid,
   TextField,
   Card,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import CircularProgress from "@material-ui/core/CircularProgress";
+} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 /* Components */
-import Endpoint from "../../components/Endpoint";
-import Stepper from "../../components/Stepper";
+import Endpoint from '../../components/Endpoint';
+import Stepper from '../../components/Stepper';
+
+/* Services */
+import cloudsService from '../../services/clouds.service';
+import configsService from '../../services/configs.service';
 
 /* Logos */
-import krakend from "../../assets/images/krakend.png";
-import kong from "../../assets/images/kong.png";
-import tyk from "../../assets/images/tyk.png";
-import gcp from "../../assets/images/gcp.png";
-import aws from "../../assets/images/aws.png";
-import azure from "../../assets/images/azure.png";
+import krakend from '../../assets/images/krakend.png';
+import kong from '../../assets/images/kong.png';
+import tyk from '../../assets/images/tyk.png';
+import gcp from '../../assets/images/gcp.png';
+import aws from '../../assets/images/aws.png';
+import azure from '../../assets/images/azure.png';
 
 const APIDoc = ({ endpoints }) => {
   const [loading, setLoading] = useState(false);
@@ -118,20 +123,20 @@ const APIDoc = ({ endpoints }) => {
 const APIGatewayCard = ({ gateway, onSelect }) => {
   const classes = makeStyles(() => ({
     selected: {
-      boxShadow: "0 0 8px 3px green",
+      boxShadow: '0 0 8px 3px green',
     },
     pointer: {
-      cursor: "pointer",
+      cursor: 'pointer',
     },
     fullHeight: {
-      height: "100%",
-      borderRadius: "20px",
+      height: '100%',
+      borderRadius: '20px',
     },
   }))();
 
   const handleLearnMoreClick = (event) => {
     event.stopPropagation();
-    window.open("https://www.google.com", "_blank");
+    window.open('https://www.google.com', '_blank');
   };
 
   return (
@@ -143,7 +148,7 @@ const APIGatewayCard = ({ gateway, onSelect }) => {
     >
       <Box padding={3}>
         <Box display="flex" justifyContent="center" marginBottom={2}>
-          <img src={gateway.logo} alt="Logo" style={{ maxWidth: "50%" }} />
+          <img src={gateway.logo} alt="Logo" style={{ maxWidth: '50%' }} />
         </Box>
         <hr></hr>
         <Box
@@ -186,20 +191,20 @@ const APIGateways = ({ gateways, onSelect }) => {
 const CloudCard = ({ cloud, onSelect }) => {
   const classes = makeStyles(() => ({
     selected: {
-      boxShadow: "0 0 8px 3px green",
+      boxShadow: '0 0 8px 3px green',
     },
     pointer: {
-      cursor: "pointer",
+      cursor: 'pointer',
     },
     fullHeight: {
-      height: "100%",
-      borderRadius: "20px",
+      height: '100%',
+      borderRadius: '20px',
     },
   }))();
 
   const handleLearnMoreClick = (event) => {
     event.stopPropagation();
-    window.open("https://www.google.com", "_blank");
+    window.open('https://www.google.com', '_blank');
   };
 
   return (
@@ -211,7 +216,7 @@ const CloudCard = ({ cloud, onSelect }) => {
     >
       <Box padding={3}>
         <Box display="flex" justifyContent="center" marginBottom={2}>
-          <img src={cloud.logo} alt="Logo" style={{ maxWidth: "40%" }} />
+          <img src={cloud.logo} alt="Logo" style={{ maxWidth: '40%' }} />
         </Box>
         <hr></hr>
         <Box
@@ -221,7 +226,6 @@ const CloudCard = ({ cloud, onSelect }) => {
           fontWeight="fontWeightBold"
         >
           <Typography variant="h5">{cloud.name}</Typography>
-          <p onClick={handleLearnMoreClick}>Learn more</p>
         </Box>
       </Box>
     </Card>
@@ -232,16 +236,39 @@ const Clouds = ({ clouds, onSelect }) => {
   return (
     <Box>
       <Box py={2}>
-        <Typography variant="h5">Cloud Providers</Typography>
-        <Typography variant="subtitle1" color="textSecondary" paragraph>
-          Choose in which clouds the API Gateways will be deployed.
-        </Typography>
+        <Box display="flex" justifyContent="space-between">
+          <Box>
+            <Typography variant="h5">Cloud Providers</Typography>
+            <Typography variant="subtitle1" color="textSecondary" paragraph>
+              Choose in which clouds the API Gateways will be deployed.
+            </Typography>
+          </Box>
+          <Box>
+            <Button
+              variant="contained"
+              color="secondary"
+              component={RouterLink}
+              to="/clouds/new"
+            >
+              New
+            </Button>
+          </Box>
+        </Box>
+
         <Grid container spacing={2}>
-          {clouds.map((cloud, index) => (
-            <Grid item xs={4} key={index}>
-              <CloudCard cloud={cloud} onSelect={() => onSelect(index)} />
-            </Grid>
-          ))}
+          {clouds.length ? (
+            clouds.map((cloud, index) => (
+              <Grid item xs={4} key={index}>
+                <CloudCard cloud={cloud} onSelect={() => onSelect(index)} />
+              </Grid>
+            ))
+          ) : (
+            <Box display="flex" margin="auto">
+              <Typography>
+                There are no clouds available. Please, create a new one.
+              </Typography>
+            </Box>
+          )}
         </Grid>
       </Box>
 
@@ -303,7 +330,7 @@ const Confirmation = ({ endpoints, gateways, clouds, onError }) => {
         <Typography variant="h5">Confirmation</Typography>
         <p>Endpoints: {endpoints.length}</p>
         <p>Gateways: {filtered_gateways.map((gateway) => gateway.name)}</p>
-        <p>Clouds: {filtered_clouds.map((cloud) => cloud.name)}</p>
+        <p>Clouds: {filtered_clouds.map((cloud) => cloud.id)}</p>
       </Box>
     </Box>
   );
@@ -311,22 +338,22 @@ const Confirmation = ({ endpoints, gateways, clouds, onError }) => {
 
 const ConfigNew = () => {
   const history = useHistory();
-  const steps = ["Documentation", "API Gateways", "Cloud", "Confirmation"];
+  const steps = ['Documentation', 'API Gateways', 'Cloud', 'Confirmation'];
   const [is_submitting, setSubmitting] = useState(false);
   const [endpoints, setEndpoints] = useState([
-    { path: "/endpoint1", method: "GET" },
-    { path: "/endpoint2", method: "POST" },
-    { path: "/endpoint3", method: "PUT" },
-    { path: "/endpoint4", method: "DELETE" },
-    { path: "/endpoint5", method: "PATCH" },
-    { path: "/endpoint6", method: "OPTIONS" },
-    { path: "/endpoint7", method: "HEAD" },
+    { path: '/endpoint1', method: 'GET' },
+    { path: '/endpoint2', method: 'POST' },
+    { path: '/endpoint3', method: 'PUT' },
+    { path: '/endpoint4', method: 'DELETE' },
+    { path: '/endpoint5', method: 'PATCH' },
+    { path: '/endpoint6', method: 'OPTIONS' },
+    { path: '/endpoint7', method: 'HEAD' },
   ]);
 
   const [gateways, setGateways] = useState([
-    { name: "KrakenD", logo: krakend, is_selected: true },
-    { name: "Kong", logo: kong, is_selected: false },
-    { name: "Tyk", logo: tyk, is_selected: false },
+    { name: 'KrakenD', logo: krakend, is_selected: true },
+    { name: 'Kong', logo: kong, is_selected: false },
+    { name: 'Tyk', logo: tyk, is_selected: false },
   ]);
 
   const handleGatewaySelect = (index) => {
@@ -334,16 +361,37 @@ const ConfigNew = () => {
     setGateways(JSON.parse(JSON.stringify(gateways))); // TODO
   };
 
-  const [clouds, setClouds] = useState([
-    { name: "GCP", logo: gcp, is_selected: true },
-    { name: "AWS", logo: aws, is_selected: false },
-    { name: "Azure", logo: azure, is_selected: false },
-  ]);
+  const [clouds, setClouds] = useState([]);
 
   const handleCloudSelect = (index) => {
     clouds[index].is_selected = !clouds[index].is_selected;
     setClouds(JSON.parse(JSON.stringify(clouds))); // TODO
   };
+
+  useEffect(() => {
+    const fetchClouds = async () => {
+      const clouds = await cloudsService.getClouds();
+
+      clouds.forEach((cloud) => {
+        cloud.is_selected = false;
+        switch (cloud.provider) {
+          case 'GCP':
+            cloud.logo = gcp;
+            break;
+          case 'AZURE':
+            cloud.logo = azure;
+            break;
+          case 'AWS':
+            cloud.logo = aws;
+            break;
+        }
+      });
+
+      setClouds(clouds);
+    };
+
+    fetchClouds();
+  }, []);
 
   const [error, setError] = useState(false);
   const handleError = (value) => {
@@ -379,15 +427,32 @@ const ConfigNew = () => {
     }
   };
 
-  const handleCreateConfig = () => {
+  const handleCreateConfig = async () => {
     setSubmitting(true);
 
-    setTimeout(() => {
+    const filtered_gateways = gateways
+      .filter((gateway) => gateway.is_selected)
+      .map((gateway) => gateway.name.toUpperCase());
+    const filtered_clouds = clouds
+      .filter((cloud) => cloud.is_selected)
+      .map((cloud) => cloud.id);
+
+    const config = await configsService.createConfig(
+      endpoints,
+      filtered_gateways,
+      filtered_clouds
+    );
+
+    if (config) {
       // TODO
       setSubmitting(false);
-      toast.success("Configuration created!");
-      history.push("/configs");
-    }, 2000);
+      toast.success('Configuration created!');
+      history.push('/configs');
+    } else {
+      // TODO
+      setSubmitting(false);
+      toast.success('Something went wrong!');
+    }
   };
 
   return (
