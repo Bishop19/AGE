@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from flask_jwt_extended import create_access_token
 from app import app, db
-from app.controllers.errors import error_response
+from app.controllers.util.errors import error_response
 from app.models.user import User
 
 

@@ -153,4 +153,4 @@ def test_get_config_not_owned(client):
 
     error = data.get_json()["message"]
 
-    assert error == "Unauthorized"
+    assert error == "Forbidden"

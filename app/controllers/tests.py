@@ -1,32 +1,18 @@
 from flask import jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import app, db
-from app.controllers.errors import error_response
 from app.models.config import Config
-from app.models.user import User
 from app.models.test import Test
 from app.models.result import Result
+from app.controllers.util.decorators import validate_user, check_config_ownership
+from app.controllers.util.errors import error_response
 
 
 @app.route("/configurations/<int:config_id>/tests", methods=["GET"])
-@jwt_required()
+@validate_user()
+@check_config_ownership()
 def get_tests(config_id):
-    # Check user
-    user_id = get_jwt_identity()["id"]
-
-    user = User.query.get(user_id)
-
-    if not user:
-        return error_response(401, "Unauthorized")
-
     # Get config
     config = Config.query.get(config_id)
-
-    if not config:
-        return error_response(404, "Config not found")
-
-    if config.user_id != user_id:
-        return error_response(401, "Unauthorized")
 
     # Get tests
     res = []
@@ -39,16 +25,9 @@ def get_tests(config_id):
 
 
 @app.route("/configurations/<int:config_id>/tests", methods=["POST"])
-@jwt_required()
+@validate_user()
+@check_config_ownership()
 def create_test(config_id):
-    # Check user
-    user_id = get_jwt_identity()["id"]
-
-    user = User.query.get(user_id)
-
-    if not user:
-        return error_response(401, "Unauthorized")
-
     # Verify running tests
     test = Test.query.filter_by(config_id=config_id, is_finished=False).first()
 
@@ -65,25 +44,9 @@ def create_test(config_id):
 
 
 @app.route("/configurations/<int:config_id>/tests/<int:test_id>", methods=["GET"])
-@jwt_required()
+@validate_user()
+@check_config_ownership()
 def get_test(config_id, test_id):
-    # Check user
-    user_id = get_jwt_identity()["id"]
-
-    user = User.query.get(user_id)
-
-    if not user:
-        return error_response(401, "Unauthorized")
-
-    # Get config
-    config = Config.query.get(config_id)
-
-    if not config:
-        return error_response(404, "Config not found")
-
-    if config.user_id != user_id:
-        return error_response(401, "Unauthorized")
-
     # Get test
     test = Test.query.get(test_id)
 
@@ -94,25 +57,9 @@ def get_test(config_id, test_id):
 
 
 @app.route("/configurations/<int:config_id>/tests/<int:test_id>", methods=["PUT"])
-@jwt_required()
+@validate_user()
+@check_config_ownership()
 def test_results(config_id, test_id):
-    # Check user
-    user_id = get_jwt_identity()["id"]
-
-    user = User.query.get(user_id)
-
-    if not user:
-        return error_response(401, "Unauthorized")
-
-    # Get config
-    config = Config.query.get(config_id)
-
-    if not config:
-        return error_response(404, "Config not found")
-
-    if config.user_id != user_id:
-        return error_response(401, "Unauthorized")
-
     # Get test
     test = Test.query.get(test_id)
 
@@ -122,12 +69,13 @@ def test_results(config_id, test_id):
     if test.is_finished:
         return error_response(400, "Test already has results")
 
-    test.is_finished = True
-
     # Check request data
-    data = request.get_json() or {}
+    results = request.get_json().get("results", None)
 
-    for result in data.get("results", None):
+    if not results or len(results) == 0:
+        return error_response(400, "No results provided")
+
+    for result in results:
         try:
             res = Result(
                 gateway=result["gateway"],
@@ -139,6 +87,8 @@ def test_results(config_id, test_id):
             db.session.rollback()
             return error_response(400, "Wrong result parameters provided")
 
+    test.is_finished = True
+
     db.session.add(test)
     db.session.commit()
 
@@ -146,24 +96,11 @@ def test_results(config_id, test_id):
 
 
 @app.route("/configurations/<int:config_id>/tests/running", methods=["GET"])
-@jwt_required()
+@validate_user()
+@check_config_ownership()
 def get_running_test(config_id):
-    # Check user
-    user_id = get_jwt_identity()["id"]
-
-    user = User.query.get(user_id)
-
-    if not user:
-        return error_response(401, "Unauthorized")
-
     # Get config
     config = Config.query.get(config_id)
-
-    if not config:
-        return error_response(404, "Config not found")
-
-    if config.user_id != user_id:
-        return error_response(401, "Unauthorized")
 
     # Get running test
     test = config.tests.filter_by(is_finished=False).first()
@@ -175,24 +112,11 @@ def get_running_test(config_id):
 
 
 @app.route("/configurations/<int:config_id>/tests/finished", methods=["GET"])
-@jwt_required()
+@validate_user()
+@check_config_ownership()
 def get_finished_tests(config_id):
-    # Check user
-    user_id = get_jwt_identity()["id"]
-
-    user = User.query.get(user_id)
-
-    if not user:
-        return error_response(401, "Unauthorized")
-
     # Get config
     config = Config.query.get(config_id)
-
-    if not config:
-        return error_response(404, "Config not found")
-
-    if config.user_id != user_id:
-        return error_response(401, "Unauthorized")
 
     # Get finished tests
     res = []

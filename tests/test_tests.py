@@ -1,4 +1,11 @@
-from .data import create_auth_headers, user, user_2, test_results, invalid_test_results
+from .data import (
+    create_auth_headers,
+    user,
+    user_2,
+    test_results,
+    invalid_test_results,
+    no_test_results,
+)
 
 CONFIG_ID = 1
 CONFIG_2_ID = 2
@@ -55,7 +62,7 @@ def test_get_tests_not_owned(client):
 
     error = data.get_json()["message"]
 
-    assert error == "Unauthorized"
+    assert error == "Forbidden"
 
 
 def test_get_test(client):
@@ -99,7 +106,7 @@ def test_get_test_not_owned(client):
 
     error = data.get_json()["message"]
 
-    assert error == "Unauthorized"
+    assert error == "Forbidden"
 
 
 def test_edit_test_invalid_results(client):
@@ -114,6 +121,20 @@ def test_edit_test_invalid_results(client):
     error = data.get_json()["message"]
 
     assert error == "Wrong result parameters provided"
+
+
+def test_edit_test_no_results(client):
+    headers = create_auth_headers(user)
+
+    data = client.put(
+        f"/configurations/{CONFIG_ID}/tests/{TEST_ID}",
+        json=no_test_results,
+        headers=headers,
+    )
+
+    error = data.get_json()["message"]
+
+    assert error == "No results provided"
 
 
 def test_get_running_test(client):

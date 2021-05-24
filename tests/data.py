@@ -1,5 +1,5 @@
-from app.controllers.tests import test_results
 from flask_jwt_extended import create_access_token
+from app.controllers.tests import test_results
 
 
 # Users
@@ -111,6 +111,8 @@ test_results = {
 invalid_test_results = {
     "results": [{"gateway": "Kong", "metrics": {"cpu": 80, "memory": "good"}}]
 }
+
+no_test_results = {"results": []}
 
 
 def create_auth_headers(identity):

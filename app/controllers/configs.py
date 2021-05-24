@@ -1,15 +1,16 @@
 from flask import jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import get_jwt_identity
 from app import app, db
-from app.controllers.errors import error_response
 from app.models.config import Config
 from app.models.endpoint import Endpoint
 from app.models.user import User
 from app.models.cloud import Cloud
+from app.controllers.util.decorators import validate_user, check_config_ownership
+from app.controllers.util.errors import error_response
 
 
 @app.route("/configurations", methods=["GET"])
-@jwt_required()
+@validate_user()
 def get_configs():
     # Check user
     user_id = get_jwt_identity()["id"]
@@ -27,7 +28,7 @@ def get_configs():
 
 
 @app.route("/configurations", methods=["POST"])
-@jwt_required()
+@validate_user()
 def create_config():
     # Check user
     user_id = get_jwt_identity()["id"]
@@ -83,25 +84,17 @@ def create_config():
 
 
 @app.route("/configurations/<int:config_id>", methods=["GET"])
-@jwt_required()
+@validate_user()
+@check_config_ownership()
 def get_config(config_id):
-    # Check user
-    user_id = get_jwt_identity()["id"]
-
     # Get config
     config = Config.query.get(config_id)
-
-    if not config:
-        return error_response(404, "Config not found")
-
-    if config.user_id != user_id:
-        return error_response(401, "Unauthorized")
 
     return jsonify(config.to_dict())
 
 
 # @app.route("/configurations/<int:config_id>", methods=["POST"])
-# @jwt_required()
+# @validate_user()
 # def edit_config(config_id):
 #     data = request.get_json() or {}
 
