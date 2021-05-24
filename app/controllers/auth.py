@@ -52,15 +52,19 @@ def register():
     if not password:
         return error_response(400, "No password provided")
 
-    # Create user
-    user = User(first_name=first_name, last_name=last_name, email=email)
-    user.hash_password(password)
+    try:
+        # Create user
+        user = User(first_name=first_name, last_name=last_name, email=email)
+        user.hash_password(password)
 
-    # Store user
-    db.session.add(user)
-    db.session.commit()
+        # Store user
+        db.session.add(user)
+        db.session.commit()
 
-    # Generate JWT
-    access_token = create_access_token(identity=user.to_dict())
+        # Generate JWT
+        access_token = create_access_token(identity=user.to_dict())
 
-    return jsonify(access_token=access_token), 200
+        return jsonify(access_token=access_token), 200
+    except:
+        db.session.rollback()
+        return error_response(400, "This email is already in use")

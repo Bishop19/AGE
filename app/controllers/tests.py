@@ -95,7 +95,7 @@ def get_test(config_id, test_id):
 
 @app.route("/configurations/<int:config_id>/tests/<int:test_id>", methods=["PUT"])
 @jwt_required()
-def edit_test(config_id, test_id):
+def test_results(config_id, test_id):
     # Check user
     user_id = get_jwt_identity()["id"]
 
@@ -129,14 +129,15 @@ def edit_test(config_id, test_id):
 
     for result in data.get("results", None):
         try:
-            r = Result(
+            res = Result(
                 gateway=result["gateway"],
                 score=result["score"],
                 metrics=result["metrics"],
             )
-            test.results.append(r)
+            test.results.append(res)
         except:
-            return error_response(400, "Wrong parameters provided")
+            db.session.rollback()
+            return error_response(400, "Wrong result parameters provided")
 
     db.session.add(test)
     db.session.commit()
@@ -168,7 +169,7 @@ def get_running_test(config_id):
     test = config.tests.filter_by(is_finished=False).first()
 
     if not test:
-        return jsonify({"config": False})
+        return jsonify(False)
 
     return jsonify(test.to_dict())
 

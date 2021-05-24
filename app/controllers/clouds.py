@@ -13,9 +13,6 @@ def get_clouds():
 
     user = User.query.get(user_id)
 
-    if not user:
-        return error_response(401, "Unauthorized")
-
     res = []
     clouds = user.clouds.all()
 
@@ -32,25 +29,22 @@ def create_cloud():
 
     user = User.query.get(user_id)
 
-    if not user:
-        return error_response(401, "Unauthorized")
-
     data = request.get_json() or {}
 
     name = data.get("name", None)
 
     if not name:
-        return error_response(400, "Wrong parameters provided")
+        return error_response(400, "No name provided")
 
     key = data.get("key", None)
 
     if not key:
-        return error_response(400, "Wrong parameters provided")
+        return error_response(400, "No key provided")
 
     provider = data.get("provider", None)
 
     if not provider:
-        return error_response(400, "Wrong parameters provided")
+        return error_response(400, "No provider provided")
 
     cloud = Cloud(name=name, key=key, provider=provider.upper())
     user.clouds.append(cloud)
@@ -66,11 +60,6 @@ def create_cloud():
 def get_cloud(cloud_id):
     user_id = get_jwt_identity()["id"]
 
-    user = User.query.get(user_id)
-
-    if not user:
-        return error_response(401, "Unauthorized")
-
     cloud = Cloud.query.get(cloud_id)
 
     if not cloud:
@@ -82,11 +71,11 @@ def get_cloud(cloud_id):
     return jsonify(cloud.to_dict())
 
 
-@app.route("/clouds/<int:cloud_id>", methods=["POST"])
-@jwt_required()
-def edit_cloud(cloud_id):
-    data = request.get_json() or {}
+# @app.route("/clouds/<int:cloud_id>", methods=["POST"])
+# @jwt_required()
+# def edit_cloud(cloud_id):
+#     data = request.get_json() or {}
 
-    # TODO
+#     # TODO
 
-    return f"edit cloud {cloud_id}"
+#     return f"edit cloud {cloud_id}"
