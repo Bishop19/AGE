@@ -11,7 +11,8 @@ config_clouds = db.Table(
 
 class Config(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    # name = db.Column(db.String(128), nullable=False)
+    name = db.Column(db.String(128), nullable=False)
+    domain = db.Column(db.String(128), nullable=False)
     _gateways = db.Column(db.String, nullable=False, default="[]")
     endpoints = db.relationship("Endpoint", lazy="dynamic")
     tests = db.relationship("Test", lazy="dynamic")
@@ -35,7 +36,8 @@ class Config(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            # "name": self.name,
+            "name": self.name,
+            "domain": self.domain,
             "clouds": [cloud.to_dict() for cloud in self.clouds],
             "gateways": self.gateways,
             "endpoints": [endpoint.to_dict() for endpoint in self.endpoints.all()],

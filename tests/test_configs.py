@@ -5,6 +5,11 @@ from .data import (
     user_3,
     config,
     config_2,
+    config_no_name,
+    config_no_domain,
+    config_no_endpoints,
+    config_no_clouds,
+    config_no_gateways,
     config_wrong_endpoints,
     config_wrong_clouds,
 )
@@ -43,12 +48,40 @@ def test_create_config_wrong_jwt(client):
     assert 1 == 1
 
 
+def test_create_config_no_name_provided(client):
+    headers = create_auth_headers(user)
+
+    data = client.post(
+        "/configurations",
+        json=config_no_name,
+        headers=headers,
+    )
+
+    error = data.get_json()["message"]
+
+    assert error == "No name provided"
+
+
+def test_create_config_no_domain_provided(client):
+    headers = create_auth_headers(user)
+
+    data = client.post(
+        "/configurations",
+        json=config_no_domain,
+        headers=headers,
+    )
+
+    error = data.get_json()["message"]
+
+    assert error == "No domain provided"
+
+
 def test_create_config_no_endpoints_provided(client):
     headers = create_auth_headers(user)
 
     data = client.post(
         "/configurations",
-        json={"gateways": config["gateways"], "clouds": config["clouds"]},
+        json=config_no_endpoints,
         headers=headers,
     )
 
@@ -62,7 +95,7 @@ def test_create_config_no_gateways_provided(client):
 
     data = client.post(
         "/configurations",
-        json={"endpoints": config["endpoints"], "clouds": config["clouds"]},
+        json=config_no_gateways,
         headers=headers,
     )
 
@@ -76,7 +109,7 @@ def test_create_config_no_clouds_provided(client):
 
     data = client.post(
         "/configurations",
-        json={"gateways": config["gateways"], "endpoints": config["endpoints"]},
+        json=config_no_clouds,
         headers=headers,
     )
 

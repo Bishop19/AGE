@@ -32,35 +32,104 @@ user_3 = {
 # Configs
 
 config = {
+    "name": "Testing",
+    "domain": "http://testing.test",
     "endpoints": [
         {
-            "path": "/teste",
-            "method": "post",
-            "params": {"id": "integer", "name": "string"},
-            "payload": {"recursivo": "como?"},
+            "path": "/test",
+            "method": "POST",
+            "body_params": {"id": "integer", "name": "string"},
         },
-        {"path": "teste2", "method": "Get"},
+        {"path": "/test", "method": "GET"},
     ],
     "gateways": ["kong", "krakend"],
     "clouds": [1, 2],
 }
 
 config_2 = {
+    "name": "Testing",
+    "domain": "http://testing.test",
     "endpoints": [
         {
-            "path": "/teste",
-            "method": "post",
-            "params": {"id": "integer", "name": "string"},
-            "payload": {"recursivo": "como?"},
+            "path": "/test",
+            "method": "POST",
+            "body_params": {"id": "integer", "name": "string"},
         },
-        {"path": "teste2", "method": "Get"},
+        {"path": "/test", "method": "GET"},
+    ],
+    "gateways": ["kong"],
+    "clouds": [3],
+}
+
+config_no_name = {
+    "domain": "http://testing.test",
+    "endpoints": [
+        {
+            "path": "/test",
+            "method": "POST",
+            "body_params": {"id": "integer", "name": "string"},
+        },
+        {"path": "/test", "method": "GET"},
     ],
     "gateways": ["kong", "krakend"],
-    "clouds": [3],
+    "clouds": [1, 2],
+}
+
+config_no_domain = {
+    "name": "Testing",
+    "endpoints": [
+        {
+            "path": "/test",
+            "method": "POST",
+            "body_params": {"id": "integer", "name": "string"},
+        },
+        {"path": "/test", "method": "GET"},
+    ],
+    "gateways": ["kong", "krakend"],
+    "clouds": [1, 2],
+}
+
+config_no_endpoints = {
+    "name": "Testing",
+    "domain": "http://testing.test",
+    "endpoints": [],
+    "gateways": ["kong", "krakend"],
+    "clouds": [1, 2],
+}
+
+config_no_gateways = {
+    "name": "Testing",
+    "domain": "http://testing.test",
+    "endpoints": [
+        {
+            "path": "/test",
+            "method": "POST",
+            "body_params": {"id": "integer", "name": "string"},
+        },
+        {"path": "/test", "method": "GET"},
+    ],
+    "gateways": [],
+    "clouds": [1, 2],
+}
+
+config_no_clouds = {
+    "name": "Testing",
+    "domain": "http://testing.test",
+    "endpoints": [
+        {
+            "path": "/test",
+            "method": "POST",
+            "body_params": {"id": "integer", "name": "string"},
+        },
+        {"path": "/test", "method": "GET"},
+    ],
+    "gateways": ["kong", "krakend"],
 }
 
 
 config_wrong_endpoints = {
+    "name": "Testing",
+    "domain": "http://testing.test",
     "endpoints": [
         {
             "path": "/teste",
@@ -73,15 +142,30 @@ config_wrong_endpoints = {
     "clouds": [1, 2],
 }
 
-config_wrong_clouds = {
+config_wrong_endpoints = {
+    "name": "Testing",
+    "domain": "http://testing.test",
     "endpoints": [
         {
-            "path": "/teste",
-            "method": "post",
-            "params": {"id": "integer", "name": "string"},
-            "payload": {"recursivo": "como?"},
+            "path": "/test",
+            "body_params": {"id": "integer", "name": "string"},
         },
-        {"path": "teste2", "method": "Get"},
+        {"path": "/test", "method": "GET"},
+    ],
+    "gateways": ["kong", "krakend"],
+    "clouds": [1, 2],
+}
+
+config_wrong_clouds = {
+    "name": "Testing",
+    "domain": "http://testing.test",
+    "endpoints": [
+        {
+            "path": "/test",
+            "method": "POST",
+            "body_params": {"id": "integer", "name": "string"},
+        },
+        {"path": "/test", "method": "GET"},
     ],
     "gateways": ["kong", "krakend"],
     "clouds": [3],

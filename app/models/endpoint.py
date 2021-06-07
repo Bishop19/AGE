@@ -19,16 +19,18 @@ class Endpoint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     path = db.Column(db.String(128), nullable=False)
     method = db.Column(db.Enum(Methods), nullable=False)
-    params = db.Column(db.PickleType)
-    payload = db.Column(db.PickleType)
+    query_params = db.Column(db.PickleType)
+    path_params = db.Column(db.PickleType)
+    body_params = db.Column(db.PickleType)
     config_id = db.Column(db.Integer, db.ForeignKey("config.id"))
 
     def to_dict(self):
         return {
             "path": self.path,
             "method": self.method.value,
-            "params": self.params,
-            "payload": self.payload,
+            "query_params": self.query_params,
+            "path_params": self.path_params,
+            "body_params": self.body_params,
         }
 
     def __repr__(self):
