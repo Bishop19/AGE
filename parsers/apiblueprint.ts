@@ -1,7 +1,18 @@
-import { Endpoint, Parser } from './interfaces';
+import { Parser } from './interfaces';
 
 export default class APIBlueprintParser implements Parser {
-  parse = (filename: string) => {
-    return [{ path: 'API Blueprint', method: 'NOT IMPLEMENTED' }];
+  parse = async (filename: string) => {
+    return {
+      domain: 'NOT IMPLEMENTED',
+      endpoints: [
+        {
+          path: 'API Blueprint',
+          method: 'NOT IMPLEMENTED',
+          query_params: {},
+          path_params: {},
+          body_params: {},
+        },
+      ],
+    };
   };
 }

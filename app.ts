@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import multer from 'multer';
 import { Parser } from './parsers/interfaces';
 import { verify } from './parsers/verifier';
@@ -9,7 +10,9 @@ import RAMLParser from './parsers/raml';
 const app = express();
 const upload = multer({ dest: './uploads/' });
 
-app.post('/parser', upload.single('config'), (req, res) => {
+app.use(cors());
+
+app.post('/parser', upload.single('file'), async (req, res) => {
   const file = req.file;
   if (!file) {
     res.sendStatus(400);
@@ -23,16 +26,18 @@ app.post('/parser', upload.single('config'), (req, res) => {
       parser = new OpenAPIParser();
       response = parser.parse('./uploads/' + file.filename);
       break;
-    case 'RAML':
-      parser = new RAMLParser();
-      response = parser.parse('./uploads/' + file.filename);
-      break;
-    case 'APIBLUEPRINT':
-      parser = new APIBlueprintParser();
-      response = parser.parse('./uploads/' + file.filename);
-      break;
+    // case 'RAML':
+    //   parser = new RAMLParser();
+    //   response = parser.parse('./uploads/' + file.filename);
+    //   break;
+    // case 'APIBLUEPRINT':
+    //   parser = new APIBlueprintParser();
+    //   response = parser.parse('./uploads/' + file.filename);
+    //   break;
+    default:
+      res.status(500).send({ error: 'Documentation file not valid' });
   }
-  res.send(response);
+  res.send(await response);
 });
 
 app.listen(3000, () => {
