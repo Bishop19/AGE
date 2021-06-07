@@ -24,7 +24,7 @@ const getClouds = () => {
       return response.data;
     })
     .catch((error) => {
-      console.error(error);
+      console.error('Error:', error.response?.data);
       return [];
     });
 };
@@ -40,7 +40,7 @@ const createCloud = (name, key, provider) => {
       return response.data;
     })
     .catch((error) => {
-      console.error(error);
+      console.error('Error:', error.response?.data);
       return false;
     });
 };

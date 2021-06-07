@@ -24,7 +24,7 @@ const getTests = (config_id) => {
       return response.data;
     })
     .catch((error) => {
-      console.error(error);
+      console.error('Error:', error.response?.data);
       return [];
     });
 };
@@ -36,7 +36,7 @@ const getTest = (config_id, test_id) => {
       return response.data;
     })
     .catch((error) => {
-      console.error(error);
+      console.error('Error:', error.response?.data);
       return false;
     });
 };
@@ -48,7 +48,7 @@ const createTest = (config_id) => {
       return response.data;
     })
     .catch((error) => {
-      console.error(error);
+      console.error('Error:', error.response?.data);
       return false;
     });
 };
@@ -57,11 +57,11 @@ const getRunningTest = (config_id) => {
   return instance
     .get(`/configurations/${config_id}/tests/running`, {})
     .then((response) => {
-      if (!response.data.config) return false;
+      if (!response.data) return false;
       return response.data;
     })
     .catch((error) => {
-      console.error(error);
+      console.error('Error:', error.response?.data);
       return false;
     });
 };
@@ -73,7 +73,7 @@ const getFinishedTests = (config_id) => {
       return response.data;
     })
     .catch((error) => {
-      console.error(error);
+      console.error('Error:', error.response?.data);
       return [];
     });
 };

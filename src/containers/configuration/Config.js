@@ -8,7 +8,6 @@ import {
   AppBar,
   Tabs,
   Tab,
-  Grid,
   Card,
   Table,
   TableBody,
@@ -139,7 +138,7 @@ const Info = ({ gateways, clouds, endpoints }) => {
         <Box display="flex">
           {gateways.map((gateway, index) => (
             <Box p={2} key={index}>
-              <InfoCard name={gateway.name} />
+              <InfoCard name={gateway} />
             </Box>
           ))}
         </Box>
@@ -157,13 +156,8 @@ const Info = ({ gateways, clouds, endpoints }) => {
       <Box>
         <Typography variant="h5">Endpoints</Typography>
 
-        {endpoints.map((e, index) => (
-          <Endpoint
-            key={index}
-            path={e.path}
-            params={e.params}
-            method={e.method}
-          />
+        {endpoints.map((endpoint, index) => (
+          <Endpoint key={index} endpoint={endpoint} />
         ))}
       </Box>
     </>
@@ -228,7 +222,7 @@ const ResultList = ({ results, onResultSelect }) => {
       headerName: 'Gateways',
       width: 130,
       valueGetter: (params) => {
-        const results = params.getValue('results');
+        const results = params.row.results;
         return results.map((r) => r.gateway).join(', ');
       },
     },
@@ -330,10 +324,14 @@ const Benchmark = ({ results }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => {
+            {rows.map((row, ind) => {
               const values = [];
               for (let i = 0; i < nr_gateways; i++) {
-                values.push(<TableCell>{row[i]}</TableCell>);
+                values.push(
+                  <TableCell key={'i-' + (ind + 1) * (i + 1)}>
+                    {row[i]}
+                  </TableCell>
+                );
               }
 
               return (
@@ -433,4 +431,38 @@ TabPanel.propTypes = {
 
 Benchmark.propTypes = {
   results: PropTypes.array,
+};
+
+InfoCard.propTypes = {
+  name: PropTypes.string.isRequired,
+  score: PropTypes.number,
+  className: PropTypes.string,
+};
+
+Info.propTypes = {
+  gateways: PropTypes.array.isRequired,
+  clouds: PropTypes.array.isRequired,
+  endpoints: PropTypes.array.isRequired,
+};
+
+Test.propTypes = {
+  config_id: PropTypes.number.isRequired,
+};
+
+Results.propTypes = {
+  config_id: PropTypes.number.isRequired,
+};
+
+ResultList.propTypes = {
+  results: PropTypes.array.isRequired,
+  onResultSelect: PropTypes.func.isRequired,
+};
+
+Result.propTypes = {
+  result: PropTypes.object.isRequired,
+  onBack: PropTypes.func.isRequired,
+};
+
+Scores.propTypes = {
+  result: PropTypes.object.isRequired,
 };

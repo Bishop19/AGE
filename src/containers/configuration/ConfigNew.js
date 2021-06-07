@@ -24,6 +24,7 @@ import Stepper from '../../components/Stepper';
 /* Services */
 import cloudsService from '../../services/clouds.service';
 import configsService from '../../services/configs.service';
+import parserService from '../../services/parser.service';
 
 /* Logos */
 import krakend from '../../assets/images/krakend.png';
@@ -33,16 +34,31 @@ import gcp from '../../assets/images/gcp.png';
 import aws from '../../assets/images/aws.png';
 import azure from '../../assets/images/azure.png';
 
-const APIDoc = ({ endpoints }) => {
+const APIDoc = ({ config, onConfigChange }) => {
   const [loading, setLoading] = useState(false);
   const [show_endpoints, setShowEndpoints] = useState(false);
+  const [name, setName] = useState(false);
 
-  const parseFile = () => {
-    setLoading(true);
-    setTimeout(() => {
+  const parseFile = async (event) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      setLoading(true);
+
+      const config = await parserService.parse(file);
+
+      if (config) {
+        config.name = name;
+        onConfigChange(config);
+        setShowEndpoints(true);
+      } else {
+        setShowEndpoints(false);
+        onConfigChange({});
+        toast.error('Documentation file not valid.');
+      }
+
       setLoading(false);
-      setShowEndpoints(true);
-    }, 2000);
+    }
   };
 
   return (
@@ -52,38 +68,29 @@ const APIDoc = ({ endpoints }) => {
         <Typography variant="subtitle1" color="textSecondary" paragraph>
           Basic configuration's information
         </Typography>
-        <form>
+        <form encType="multipart/form-data" method="POST">
           <Grid container spacing={2}>
             <Grid item xs={2}>
               Name
             </Grid>
             <Grid item xs={10}>
-              <TextField fullWidth label="Name" variant="outlined" />
-            </Grid>
-            <Grid item xs={2}>
-              Domain
-            </Grid>
-            <Grid item xs={10}>
-              <TextField fullWidth label="Domain" variant="outlined" />
+              <TextField
+                fullWidth
+                label="Name"
+                variant="outlined"
+                onChange={(event) => setName(event.target.value)}
+              />
             </Grid>
             <Grid item xs={2}>
               File
             </Grid>
             <Grid item xs={10}>
               <TextField
+                name="file"
                 fullWidth
                 type="file"
                 variant="outlined"
-                onChange={(event) => {
-                  const file = event.target.files[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (output) => {
-                      parseFile(output.target.result);
-                    };
-                    reader.readAsText(file);
-                  }
-                }}
+                onChange={(event) => parseFile(event)}
               />
             </Grid>
           </Grid>
@@ -94,16 +101,15 @@ const APIDoc = ({ endpoints }) => {
           <hr></hr>
           <Box py={2}>
             <Typography variant="h5">Endpoints</Typography>
-            <Typography variant="subtitle1" color="textSecondary" paragraph>
+            <Typography variant="subtitle1" color="textSecondary">
               Check if the endpoints are correct
             </Typography>
+            <Typography variant="subtitle1" color="textSecondary" paragraph>
+              Domain: {config.domain}
+            </Typography>
 
-            {endpoints.map((endpoint, index) => (
-              <Endpoint
-                key={index}
-                path={endpoint.path}
-                method={endpoint.method}
-              ></Endpoint>
+            {config.endpoints.map((endpoint, index) => (
+              <Endpoint key={index} endpoint={endpoint}></Endpoint>
             ))}
           </Box>
         </>
@@ -201,11 +207,6 @@ const CloudCard = ({ cloud, onSelect }) => {
       borderRadius: '20px',
     },
   }))();
-
-  const handleLearnMoreClick = (event) => {
-    event.stopPropagation();
-    window.open('https://www.google.com', '_blank');
-  };
 
   return (
     <Card
@@ -308,13 +309,14 @@ const Clouds = ({ clouds, onSelect }) => {
   );
 };
 
-const Confirmation = ({ endpoints, gateways, clouds, onError }) => {
+const Confirmation = ({ config, gateways, clouds, onError }) => {
   const filtered_gateways = gateways.filter((gateway) => gateway.is_selected);
   const filtered_clouds = clouds.filter((cloud) => cloud.is_selected);
 
   useEffect(() => {
     if (
-      endpoints.length &&
+      Object.keys(config).length && // check empty object
+      config.endpoints.length &&
       filtered_gateways.length &&
       filtered_clouds.length
     ) {
@@ -328,7 +330,7 @@ const Confirmation = ({ endpoints, gateways, clouds, onError }) => {
     <Box>
       <Box margin="20px 0">
         <Typography variant="h5">Confirmation</Typography>
-        <p>Endpoints: {endpoints.length}</p>
+        <p>Endpoints: {config.endpoints?.length}</p>
         <p>Gateways: {filtered_gateways.map((gateway) => gateway.name)}</p>
         <p>Clouds: {filtered_clouds.map((cloud) => cloud.id)}</p>
       </Box>
@@ -340,15 +342,7 @@ const ConfigNew = () => {
   const history = useHistory();
   const steps = ['Documentation', 'API Gateways', 'Cloud', 'Confirmation'];
   const [is_submitting, setSubmitting] = useState(false);
-  const [endpoints, setEndpoints] = useState([
-    { path: '/endpoint1', method: 'GET' },
-    { path: '/endpoint2', method: 'POST' },
-    { path: '/endpoint3', method: 'PUT' },
-    { path: '/endpoint4', method: 'DELETE' },
-    { path: '/endpoint5', method: 'PATCH' },
-    { path: '/endpoint6', method: 'OPTIONS' },
-    { path: '/endpoint7', method: 'HEAD' },
-  ]);
+  const [config, setConfig] = useState({});
 
   const [gateways, setGateways] = useState([
     { name: 'KrakenD', logo: krakend, is_selected: true },
@@ -394,17 +388,14 @@ const ConfigNew = () => {
   }, []);
 
   const [error, setError] = useState(false);
-  const handleError = (value) => {
-    setError(value);
-  };
 
   /* eslint-disable react/jsx-key */
   const components = [
-    <APIDoc endpoints={endpoints} />,
+    <APIDoc config={config} onConfigChange={setConfig} />,
     <APIGateways gateways={gateways} onSelect={handleGatewaySelect} />,
     <Clouds clouds={clouds} onSelect={handleCloudSelect} />,
     <Confirmation
-      endpoints={endpoints}
+      config={config}
       gateways={gateways}
       clouds={clouds}
       onError={setError}
@@ -437,13 +428,15 @@ const ConfigNew = () => {
       .filter((cloud) => cloud.is_selected)
       .map((cloud) => cloud.id);
 
-    const config = await configsService.createConfig(
-      endpoints,
+    const valid = await configsService.createConfig(
+      config.name,
+      config.domain,
+      config.endpoints,
       filtered_gateways,
       filtered_clouds
     );
 
-    if (config) {
+    if (valid) {
       // TODO
       setSubmitting(false);
       toast.success('Configuration created!');
@@ -451,7 +444,7 @@ const ConfigNew = () => {
     } else {
       // TODO
       setSubmitting(false);
-      toast.success('Something went wrong!');
+      toast.error('Something went wrong!');
     }
   };
 
@@ -503,7 +496,8 @@ export default ConfigNew;
 /* Proptypes */
 
 APIDoc.propTypes = {
-  endpoints: PropTypes.arrayOf(PropTypes.object).isRequired,
+  config: PropTypes.object.isRequired,
+  onConfigChange: PropTypes.func.isRequired,
 };
 
 APIGatewayCard.propTypes = {
@@ -527,7 +521,7 @@ Clouds.propTypes = {
 };
 
 Confirmation.propTypes = {
-  endpoints: PropTypes.arrayOf(PropTypes.object).isRequired,
+  config: PropTypes.object.isRequired,
   gateways: PropTypes.arrayOf(PropTypes.object).isRequired,
   clouds: PropTypes.arrayOf(PropTypes.object).isRequired,
   onError: PropTypes.func.isRequired,

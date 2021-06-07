@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Box, Button, Card, Chip, Grid, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import Status from '../../components/Status';
+
+/* Material UI */
+import { Box, Button, Card, Grid, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+
+/* Services */
+import configsService from '../../services/configs.service';
 
 /* Icons */
 import AddIcon from '@material-ui/icons/Add';
@@ -11,7 +16,6 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import RoomIcon from '@material-ui/icons/Room';
 import InputIcon from '@material-ui/icons/Input';
 import CloudIcon from '@material-ui/icons/Cloud';
-import configsService from '../../services/configs.service';
 
 const NoConfigs = () => {
   return (
@@ -32,7 +36,7 @@ const NoConfigs = () => {
   );
 };
 
-const useCardStyles = makeStyles((theme) => ({
+const useCardStyles = makeStyles(() => ({
   card: {
     '&:hover': {
       boxShadow: `0px 2px 4px -1px rgb(0 0 0 / 30%), 
@@ -101,10 +105,38 @@ const ConfigList = () => {
   // TODO - Remove this
   const addDummyConfig = () => {
     setConfigurations([
-      { id: 1, name: 'Teste', state: 'Running' },
-      { id: 2, name: 'teste 2', state: 'Finished' },
-      { id: 3, name: 'teste 3', state: 'No results' },
-      { id: 4, name: 'teste 4', state: 'Error' },
+      {
+        id: 1,
+        name: 'Teste',
+        state: 'Running',
+        clouds: [1],
+        gateways: ['krakend'],
+        endpoints: [{}],
+      },
+      {
+        id: 2,
+        name: 'teste 2',
+        state: 'Finished',
+        clouds: [1],
+        gateways: ['krakend'],
+        endpoints: [{}],
+      },
+      {
+        id: 3,
+        name: 'teste 3',
+        state: 'No results',
+        clouds: [1],
+        gateways: ['krakend'],
+        endpoints: [{}],
+      },
+      {
+        id: 4,
+        name: 'teste 4',
+        state: 'Error',
+        clouds: [1],
+        gateways: ['krakend'],
+        endpoints: [{}],
+      },
     ]);
   };
 

@@ -37,7 +37,7 @@ const getConfigs = () => {
       return configs;
     })
     .catch((error) => {
-      console.error(error);
+      console.error('Error:', error.response?.data);
       return [];
     });
 };
@@ -49,14 +49,16 @@ const getConfig = (id) => {
       return response.data;
     })
     .catch((error) => {
-      console.error(error);
+      console.error('Error:', error.response?.data);
       return false;
     });
 };
 
-const createConfig = (endpoints, gateways, clouds) => {
+const createConfig = (name, domain, endpoints, gateways, clouds) => {
   return instance
     .post(`/configurations`, {
+      name,
+      domain,
       endpoints,
       gateways,
       clouds,
@@ -65,7 +67,7 @@ const createConfig = (endpoints, gateways, clouds) => {
       return response.data;
     })
     .catch((error) => {
-      console.error(error);
+      console.error('Error:', error.response?.data);
       return false;
     });
 };

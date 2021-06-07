@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box } from '@material-ui/core';
 
-const Endpoint = ({ path, params, method }) => {
+const Endpoint = ({ endpoint }) => {
+  const { path, method, path_params, query_params, body_params } = endpoint;
+
   const getBackgroundColor = () => {
     switch (method.toUpperCase()) {
       case 'GET':
@@ -59,7 +61,9 @@ const Endpoint = ({ path, params, method }) => {
       {is_expanded && (
         <Box>
           <hr></hr>
-          Expanded
+          <Box>Query: {JSON.stringify(query_params)}</Box>
+          <Box>Path: {JSON.stringify(path_params)}</Box>
+          <Box>Body: {JSON.stringify(body_params)}</Box>
         </Box>
       )}
     </Box>
@@ -71,7 +75,5 @@ export default Endpoint;
 /* Proptypes */
 
 Endpoint.propTypes = {
-  path: PropTypes.string.isRequired,
-  params: PropTypes.object,
-  method: PropTypes.string.isRequired,
+  endpoint: PropTypes.object.isRequired,
 };

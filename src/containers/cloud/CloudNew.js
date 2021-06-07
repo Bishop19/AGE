@@ -1,26 +1,21 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { toast } from 'react-toastify';
 
 /* Material UI */
-import {
-  Box,
-  Button,
-  Typography,
-  Grid,
-  TextField,
-  Card,
-} from '@material-ui/core';
+import { Box, Button, Typography, Grid, Card } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
+
+/* Services */
+import cloudsService from '../../services/clouds.service';
 
 /* Logos */
 import gcp from '../../assets/images/gcp.png';
 import aws from '../../assets/images/aws.png';
 import azure from '../../assets/images/azure.png';
-import { useHistory } from 'react-router';
-import cloudsService from '../../services/clouds.service';
 
 const CloudCard = ({ cloud, onSelect }) => {
   const classes = makeStyles(() => ({
