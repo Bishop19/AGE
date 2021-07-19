@@ -62,7 +62,12 @@ def create_config():
         return error_response(400, "No clouds provided")
 
     # Create config and endpoints
-    config = Config(name=name, domain=domain, gateways=gateways, user_id=user_id)
+    config = Config(
+        name=name,
+        domain=domain,
+        gateways=[gateway.upper() for gateway in gateways],
+        user_id=user_id,
+    )
 
     for endpoint_data in endpoints:
         try:
@@ -72,6 +77,7 @@ def create_config():
                 query_params=endpoint_data.get("query_params", None),
                 path_params=endpoint_data.get("path_params", None),
                 body_params=endpoint_data.get("body_params", None),
+                security=endpoint_data.get("security", "NONE"),
             )
             config.endpoints.append(endpoint)
         except:

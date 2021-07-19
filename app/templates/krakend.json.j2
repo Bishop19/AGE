@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "extra_config": {
+    "github_com/devopsfaith/krakend-cors": {
+      "allow_origins": ["*"],
+      "max_age": "12h",
+      "allow_methods": ["GET", "HEAD", "POST", "PUT", "DELETE"]
+    }
+  },
+  "output_encoding": "json",
+  "name": "{{ name }}",
+  "endpoints": [{% for endpoint in endpoints %}
+    {
+      "endpoint": "{{ endpoint.path }}",
+      "method": "{{ endpoint.method }}",
+      "output_encoding": "no-op",
+      {% if endpoint.query_params|length > 0 %}
+      "querystring_params": [
+      {% for param in endpoint.query_params %}
+        "{{param}}"{% if not loop.last %},{% endif %}
+      {% endfor %}
+      ],
+      {% endif %}
+      "backend": [
+        {
+          "url_pattern": "{{ endpoint.path }}",
+          "encoding": "no-op",
+          "method": "{{ endpoint.method }}",
+          "host": ["{{ domain }}"]
+        }
+      ]
+      {% if endpoint.security == "JWT" %}
+      ,
+      "headers_to_pass": [
+        "Authorization"
+      ]
+      {% endif %}
+    }{% if not loop.last %},{% endif %}
+  {%- endfor %}
+  ]
+}

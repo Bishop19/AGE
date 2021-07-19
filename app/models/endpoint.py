@@ -22,6 +22,7 @@ class Endpoint(db.Model):
     query_params = db.Column(db.PickleType)
     path_params = db.Column(db.PickleType)
     body_params = db.Column(db.PickleType)
+    security = db.Column(db.String(32), nullable=False, default="NONE")
     config_id = db.Column(db.Integer, db.ForeignKey("config.id"))
 
     def to_dict(self):
@@ -31,6 +32,7 @@ class Endpoint(db.Model):
             "query_params": self.query_params,
             "path_params": self.path_params,
             "body_params": self.body_params,
+            "security": self.security,
         }
 
     def __repr__(self):

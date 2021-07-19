@@ -14,4 +14,4 @@ db = SQLAlchemy(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
 
-from app.controllers import auth, configs, clouds, tests
+from app.controllers import auth, configs, clouds, tests, templates

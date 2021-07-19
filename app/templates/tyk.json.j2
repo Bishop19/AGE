@@ -1,0 +1,37 @@
+{
+  "name": "Test API",
+  "use_keyless": true,
+  "version_data": {
+    "not_versioned": true,
+    "versions": {
+      "Default": {
+        "name": "Default",
+        "use_extended_paths": true,
+        "extended_paths": {
+          "white_list": [
+            {% for endpoint in endpoints %}
+              {
+                  "path": "{{ endpoint.path }}",
+                  "ignore_case": false,
+                  "method_actions": {
+                      "{{ endpoint.method }}": {
+                          "action": "no_action",
+                          "code": 200,
+                          "data": "",
+                          "headers": {}
+                      }
+                  }
+              }{% if not loop.last %},{% endif %}
+            {%- endfor %}
+          ]
+        }
+      }
+    }
+  },
+  "proxy": {
+    "listen_path": "/",
+    "target_url": "{{ domain }}",
+    "strip_listen_path": true
+  },
+  "active": true
+}
