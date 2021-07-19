@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
+import { toast } from 'react-toastify';
+
+/* Material UI */
 import {
   Box,
   IconButton,
@@ -70,7 +73,7 @@ const TabPanel = (props) => {
   );
 };
 
-const InfoCard = ({ name, score, className }) => {
+const InfoCard = ({ name, score, className, downloadable }) => {
   const selectImage = (name) => {
     switch (name.toUpperCase()) {
       case 'GCP':
@@ -96,10 +99,32 @@ const InfoCard = ({ name, score, className }) => {
       width: '200px',
       borderRadius: '20px',
     },
+    clickable: {
+      '&:hover': {
+        cursor: 'pointer',
+      },
+    },
   }))();
 
+  const dowloadGatewayConfig = async (gateway) => {
+    const valid = await configsService.getGatewayConfig(9, gateway);
+
+    if (!valid) {
+      toast.error('Something went wrong');
+    }
+  };
+
   return (
-    <Card className={clsx(classes.fullHeight, className)}>
+    <Card
+      className={clsx(classes.fullHeight, className, {
+        [classes.clickable]: downloadable,
+      })}
+      onClick={
+        downloadable
+          ? () => dowloadGatewayConfig(name.toLowerCase())
+          : undefined
+      }
+    >
       <Box display="flex" flexDirection="column" height="100%">
         <Box
           flexGrow={1}
@@ -138,7 +163,7 @@ const Info = ({ gateways, clouds, endpoints }) => {
         <Box display="flex">
           {gateways.map((gateway, index) => (
             <Box p={2} key={index}>
-              <InfoCard name={gateway} />
+              <InfoCard name={gateway} downloadable />
             </Box>
           ))}
         </Box>
@@ -437,6 +462,11 @@ InfoCard.propTypes = {
   name: PropTypes.string.isRequired,
   score: PropTypes.number,
   className: PropTypes.string,
+  downloadable: PropTypes.bool,
+};
+
+InfoCard.defaultProps = {
+  downloadable: false,
 };
 
 Info.propTypes = {

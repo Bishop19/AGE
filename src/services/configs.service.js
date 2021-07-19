@@ -1,4 +1,5 @@
 import axios from 'axios';
+import fileDownload from 'js-file-download';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -72,8 +73,22 @@ const createConfig = (name, domain, endpoints, gateways, clouds) => {
     });
 };
 
+const getGatewayConfig = (id, gateway) => {
+  return instance
+    .get(`/configurations/${id}/${gateway}`)
+    .then((response) => {
+      fileDownload(JSON.stringify(response.data, undefined, 2), gateway);
+      return true;
+    })
+    .catch((error) => {
+      console.error('Error:', error.response?.data);
+      return false;
+    });
+};
+
 export default {
   getConfigs,
   getConfig,
   createConfig,
+  getGatewayConfig,
 };
