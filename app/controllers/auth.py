@@ -65,6 +65,7 @@ def register():
         access_token = create_access_token(identity=user.to_dict())
 
         return jsonify(access_token=access_token), 200
-    except:
+    except Exception as err:
+        print(err)
         db.session.rollback()
         return error_response(400, "This email is already in use")

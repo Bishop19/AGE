@@ -6,6 +6,7 @@ from flask_cors import CORS
 
 from config import Config
 
+
 app = Flask(__name__)
 app.config.from_object(Config)
 
@@ -13,5 +14,7 @@ CORS(app)
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
+
+db.metadata.clear()
 
 from app.controllers import auth, configs, clouds, tests, templates

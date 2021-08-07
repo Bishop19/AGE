@@ -2,11 +2,23 @@
 import json
 from app import db
 
-config_clouds = db.Table(
-    "config_clouds",
-    db.Column("config_id", db.Integer, db.ForeignKey("config.id"), primary_key=True),
-    db.Column("cloud_id", db.Integer, db.ForeignKey("cloud.id"), primary_key=True),
-)
+
+class ConfigCloud(db.Model):
+    __tablename__ = "config_cloud"
+    __table_args__ = {"extend_existing": True}
+    config_id = db.Column(
+        "config_id", db.Integer, db.ForeignKey("config.id"), primary_key=True
+    )
+    cloud_id = db.Column(
+        "cloud_id", db.Integer, db.ForeignKey("cloud.id"), primary_key=True
+    )
+    is_deployed = db.Column(db.Boolean, default=False)
+    config = db.relationship("Config", back_populates="cloud")
+    cloud = db.relationship("Cloud")
+
+    @property
+    def credentials(self):
+        return self.cloud.provider.credentials
 
 
 class Config(db.Model):
@@ -16,12 +28,8 @@ class Config(db.Model):
     _gateways = db.Column(db.String, nullable=False, default="[]")
     endpoints = db.relationship("Endpoint", lazy="dynamic")
     tests = db.relationship("Test", lazy="dynamic")
-    clouds = db.relationship(
-        "Cloud",
-        secondary=config_clouds,
-        lazy="subquery",
-        backref=db.backref("configs", lazy=True),
-    )
+    cloud = db.relationship("ConfigCloud", back_populates="config", uselist=False)
+    instances = db.relationship("Instance", lazy="dynamic")
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     @property
@@ -38,11 +46,19 @@ class Config(db.Model):
             "id": self.id,
             "name": self.name,
             "domain": self.domain,
-            "clouds": [cloud.to_dict() for cloud in self.clouds],
+            "instances": [
+                instance.to_dict() for instance in self.instances.all()
+            ],  # TODO: INSERIR NA CLOUD?
+            "cloud": {
+                "id": self.cloud.cloud_id,
+                "name": self.cloud.cloud.name,
+                "provider": self.cloud.cloud.provider.name.value,
+                "is_deployed": self.cloud.is_deployed,
+            },
             "gateways": self.gateways,
             "endpoints": [endpoint.to_dict() for endpoint in self.endpoints.all()],
             "tests": [test.to_dict() for test in self.tests.all()],
         }
 
     def __repr__(self):
-        return f"<Config {self.id} from {self.user_id}>"
+        return f"<Config {self.id} from User {self.user_id}>"

@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from flask_jwt_extended import get_jwt_identity
 from app import app, db
-from app.models.cloud import Cloud
+from app.models.cloud import Cloud, Provider
 from app.models.user import User
 from app.controllers.util.errors import error_response
 from app.controllers.util.decorators import validate_user
@@ -47,7 +47,13 @@ def create_cloud():
     if not provider:
         return error_response(400, "No provider provided")
 
-    cloud = Cloud(name=name, key=key, provider=provider.upper())
+    region = data.get("region", None)
+
+    if not region:
+        return error_response(400, "No region provided")
+
+    provider = Provider(name=provider.upper(), credentials=key, region=region)
+    cloud = Cloud(name=name, provider=provider)
     user.clouds.append(cloud)
 
     db.session.add(user)
