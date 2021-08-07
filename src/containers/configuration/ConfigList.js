@@ -67,10 +67,6 @@ const ConfigCard = ({ config }) => {
             <InputIcon></InputIcon>
             <Box pl={1}>{config.gateways.length}</Box>
           </Box>
-          <Box flexGrow={1} display="flex" alignItems="center">
-            <CloudIcon></CloudIcon>
-            <Box pl={1}>{config.clouds.length}</Box>
-          </Box>
         </Box>
       </Card>
     </RouterLink>

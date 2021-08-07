@@ -55,14 +55,14 @@ const getConfig = (id) => {
     });
 };
 
-const createConfig = (name, domain, endpoints, gateways, clouds) => {
+const createConfig = (name, domain, endpoints, gateways, cloud) => {
   return instance
     .post(`/configurations`, {
       name,
       domain,
       endpoints,
       gateways,
-      clouds,
+      cloud,
     })
     .then((response) => {
       return response.data;
@@ -86,9 +86,24 @@ const getGatewayConfig = (id, gateway) => {
     });
 };
 
+const deployGateways = (id) => {
+  return instance
+    .post(`/configurations/${id}/deploy`, {
+      id,
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.error('Error:', error.response?.data);
+      return false;
+    });
+};
+
 export default {
   getConfigs,
   getConfig,
   createConfig,
   getGatewayConfig,
+  deployGateways,
 };

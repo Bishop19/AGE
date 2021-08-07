@@ -272,53 +272,20 @@ const Clouds = ({ clouds, onSelect }) => {
           )}
         </Grid>
       </Box>
-
-      <hr></hr>
-
-      <Box py={2}>
-        <Typography variant="h5">Machine Specification</Typography>
-        <Typography variant="subtitle1" color="textSecondary" paragraph>
-          Choose the hardware in which the API Gateway will be deployed.
-        </Typography>
-        <form>
-          <Box display="flex">
-            <Box display="flex" flexGrow={1} pr={12}>
-              <Grid container spacing={2}>
-                <Grid item xs={2}>
-                  CPU
-                </Grid>
-                <Grid item xs={10}>
-                  <TextField fullWidth label="CPU" variant="outlined" />
-                </Grid>
-              </Grid>
-            </Box>
-            <Box display="flex" flexGrow={1} pr={12}>
-              <Grid container spacing={2}>
-                <Grid item xs={2}>
-                  RAM
-                </Grid>
-                <Grid item xs={10}>
-                  <TextField fullWidth label="RAM" variant="outlined" />
-                </Grid>
-              </Grid>
-            </Box>
-          </Box>
-        </form>
-      </Box>
     </Box>
   );
 };
 
 const Confirmation = ({ config, gateways, clouds, onError }) => {
   const filtered_gateways = gateways.filter((gateway) => gateway.is_selected);
-  const filtered_clouds = clouds.filter((cloud) => cloud.is_selected);
+  const filtered_cloud = clouds.filter((cloud) => cloud.is_selected)[0];
 
   useEffect(() => {
     if (
       Object.keys(config).length && // check empty object
       config.endpoints.length &&
       filtered_gateways.length &&
-      filtered_clouds.length
+      filtered_cloud
     ) {
       onError(false);
     } else {
@@ -332,7 +299,7 @@ const Confirmation = ({ config, gateways, clouds, onError }) => {
         <Typography variant="h5">Confirmation</Typography>
         <p>Endpoints: {config.endpoints?.length}</p>
         <p>Gateways: {filtered_gateways.map((gateway) => gateway.name)}</p>
-        <p>Clouds: {filtered_clouds.map((cloud) => cloud.id)}</p>
+        <p>Cloud: {filtered_cloud.name}</p>
       </Box>
     </Box>
   );
@@ -358,6 +325,7 @@ const ConfigNew = () => {
   const [clouds, setClouds] = useState([]);
 
   const handleCloudSelect = (index) => {
+    clouds.forEach((cloud) => (cloud.is_selected = false));
     clouds[index].is_selected = !clouds[index].is_selected;
     setClouds(JSON.parse(JSON.stringify(clouds))); // TODO
   };
@@ -368,7 +336,7 @@ const ConfigNew = () => {
 
       clouds.forEach((cloud) => {
         cloud.is_selected = false;
-        switch (cloud.provider) {
+        switch (cloud.provider.name) {
           case 'GCP':
             cloud.logo = gcp;
             break;
@@ -424,16 +392,16 @@ const ConfigNew = () => {
     const filtered_gateways = gateways
       .filter((gateway) => gateway.is_selected)
       .map((gateway) => gateway.name.toUpperCase());
-    const filtered_clouds = clouds
+    const filtered_cloud = clouds
       .filter((cloud) => cloud.is_selected)
-      .map((cloud) => cloud.id);
+      .map((cloud) => cloud.id)[0];
 
     const valid = await configsService.createConfig(
       config.name,
       config.domain,
       config.endpoints,
       filtered_gateways,
-      filtered_clouds
+      filtered_cloud
     );
 
     if (valid) {

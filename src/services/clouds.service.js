@@ -29,12 +29,13 @@ const getClouds = () => {
     });
 };
 
-const createCloud = (name, key, provider) => {
+const createCloud = (name, key, provider, region) => {
   return instance
     .post(`/clouds`, {
       name,
       key,
       provider,
+      region,
     })
     .then((response) => {
       return response.data;

@@ -5,7 +5,17 @@ import clsx from 'clsx';
 import { toast } from 'react-toastify';
 
 /* Material UI */
-import { Box, Button, Typography, Grid, Card } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Typography,
+  Grid,
+  Card,
+  TextField,
+  FormControl,
+  MenuItem,
+  Select,
+} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
@@ -56,6 +66,64 @@ const CloudCard = ({ cloud, onSelect }) => {
   );
 };
 
+const GCP = ({ name, region, onNameChange, onFileUpload, onRegionChange }) => {
+  return (
+    <Box py={2}>
+      <Typography variant="h5">Cloud information</Typography>
+      <Typography variant="subtitle1" color="textSecondary" paragraph>
+        Please, provide your service account (JSON file) and your region.
+      </Typography>
+      <form>
+        <Box display="flex" width="60%">
+          <Box display="flex" flexGrow={1}>
+            <Grid container spacing={2}>
+              <Grid item xs={2}>
+                Name
+              </Grid>
+              <Grid item xs={10}>
+                <TextField
+                  value={name}
+                  name="name"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => onNameChange(event.target.value)}
+                />
+              </Grid>
+              <Grid item xs={2}>
+                Service Account
+              </Grid>
+              <Grid item xs={10}>
+                <TextField
+                  name="file"
+                  fullWidth
+                  type="file"
+                  variant="outlined"
+                  onChange={(event) => onFileUpload(event)}
+                />
+              </Grid>
+              <Grid item xs={2}>
+                Region
+              </Grid>
+              <Grid item xs={10}>
+                <FormControl variant="outlined" style={{ width: '100%' }}>
+                  <Select
+                    value={region}
+                    onChange={(event) => onRegionChange(event.target.value)}
+                  >
+                    <MenuItem selected="selected" value={'europe-west4-a'}>
+                      Europe West 4 A
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
+      </form>
+    </Box>
+  );
+};
+
 const CloudNew = () => {
   const history = useHistory();
   const [clouds, setClouds] = useState([
@@ -63,8 +131,10 @@ const CloudNew = () => {
     { name: 'AWS', logo: aws, is_selected: false },
     { name: 'Azure', logo: azure, is_selected: false },
   ]);
-
   const [is_submitting, setSubmitting] = useState(false);
+  const [file, setFile] = useState();
+  const [region, setRegion] = useState('europe-west4-a');
+  const [name, setName] = useState('');
 
   const handleCloudSelect = (index) => {
     clouds.forEach((c, i) => {
@@ -82,7 +152,9 @@ const CloudNew = () => {
   const handleCreateCloud = async () => {
     setSubmitting(true);
 
-    const cloud = await cloudsService.createCloud('todo', 'TODO', 'GCP');
+    const provider = clouds.filter((c) => c.is_selected)[0].name;
+    const cloud = await cloudsService.createCloud(name, file, provider, region);
+
     if (cloud) {
       // TODO
       setSubmitting(false);
@@ -95,22 +167,81 @@ const CloudNew = () => {
     }
   };
 
+  const parseFile = (event) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsText(file, 'UTF-8');
+      reader.onload = function (event) {
+        setFile(JSON.parse(event.target.result));
+      };
+    }
+  };
+
   return (
     <>
       <Typography variant="h3">Create a cloud configuration</Typography>
       <Typography variant="subtitle1" color="textSecondary" paragraph>
         TODO
       </Typography>
-      <Grid container spacing={2}>
-        {clouds.map((cloud, index) => (
-          <Grid key={index} item xs={4}>
-            <CloudCard
-              cloud={cloud}
-              onSelect={() => handleCloudSelect(index)}
-            />
-          </Grid>
-        ))}
-      </Grid>
+
+      <Box py={2}>
+        <Grid container spacing={3}>
+          {clouds.map((cloud, index) => (
+            <Grid key={index} item xs={3}>
+              <CloudCard
+                cloud={cloud}
+                onSelect={() => handleCloudSelect(index)}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+
+      <hr></hr>
+
+      <GCP
+        name={name}
+        region={region}
+        onNameChange={setName}
+        onRegionChange={setRegion}
+        onFileUpload={parseFile}
+      />
+
+      {/* <Box py={2}>
+        <Typography variant="h5">Machine Specification</Typography>
+        <Typography variant="subtitle1" color="textSecondary" paragraph>
+          Choose the hardware in which the API Gateway will be deployed.
+        </Typography>
+        <form>
+          <Box display="flex">
+            <Box display="flex" flexGrow={1} pr={12}>
+              <Grid container spacing={2}>
+                <Grid item xs={2}>
+                  CPU
+                </Grid>
+                <Grid item xs={10}>
+                  <TextField fullWidth label="CPU" variant="outlined" />
+                </Grid>
+              </Grid>
+            </Box>
+            <Box display="flex" flexGrow={1} pr={12}>
+              <Grid container spacing={2}>
+                <Grid item xs={2}>
+                  RAM
+                </Grid>
+                <Grid item xs={10}>
+                  <TextField fullWidth label="RAM" variant="outlined" />
+                </Grid>
+              </Grid>
+            </Box>
+          </Box>
+        </form>
+      </Box> */}
+
+      <hr></hr>
+
       <Box display="flex" justifyContent="space-between">
         <Button
           variant="contained"
@@ -141,4 +272,12 @@ export default CloudNew;
 CloudCard.propTypes = {
   cloud: PropTypes.object.isRequired,
   onSelect: PropTypes.func.isRequired,
+};
+
+GCP.propTypes = {
+  name: PropTypes.string.isRequired,
+  onNameChange: PropTypes.func.isRequired,
+  region: PropTypes.string.isRequired,
+  onRegionChange: PropTypes.func.isRequired,
+  onFileUpload: PropTypes.func.isRequired,
 };

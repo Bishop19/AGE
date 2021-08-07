@@ -19,6 +19,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Button,
 } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
@@ -155,7 +156,7 @@ const InfoCard = ({ name, score, className, downloadable }) => {
   );
 };
 
-const Info = ({ gateways, clouds, endpoints }) => {
+const Info = ({ gateways, cloud, endpoints }) => {
   return (
     <>
       <Box>
@@ -169,13 +170,11 @@ const Info = ({ gateways, clouds, endpoints }) => {
         </Box>
       </Box>
       <Box>
-        <Typography variant="h5">Clouds</Typography>
+        <Typography variant="h5">Cloud</Typography>
         <Box display="flex">
-          {clouds.map((cloud, index) => (
-            <Box p={2} key={index}>
-              <InfoCard name={cloud.provider} />
-            </Box>
-          ))}
+          <Box p={2}>
+            <InfoCard name={cloud.provider} />
+          </Box>
         </Box>
       </Box>
       <Box>
@@ -189,31 +188,69 @@ const Info = ({ gateways, clouds, endpoints }) => {
   );
 };
 
-const Test = ({ config_id }) => {
+const Deploy = ({ config }) => {
+  const deployGateways = async () => {
+    const valid = await configsService.deployGateways(config.id);
+
+    // Todo: Rabbit?
+  };
+
+  return config.cloud.is_deployed ? (
+    <>Deployed (TODO)</>
+  ) : (
+    <>
+      <Typography variant="h5">Deploy</Typography>
+      <Typography variant="body1">
+        Based on your configuration, the following machines will be deployed:
+      </Typography>
+      {config.gateways.map((gateway, index) => (
+        <li key={index}>{gateway}</li>
+      ))}
+      <Typography variant="body1">
+        Each will have one gateway running, which will be used to load test your
+        application.
+      </Typography>
+      <Button variant="contained" onClick={deployGateways}>
+        Deploy
+      </Button>
+    </>
+  );
+};
+
+const Test = ({ config, onDeploy }) => {
   const [test, setTest] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRunningTest = async () => {
-      const test = await testsService.getRunningTest(config_id);
+      const test = await testsService.getRunningTest(config.id);
       setTest(test);
       setLoading(false);
     };
 
-    fetchRunningTest();
+    if (config.cloud.is_deployed) {
+      fetchRunningTest();
+    }
   }, []);
 
   return (
     <>
-      {loading ? (
-        <p>Loading</p>
-      ) : test ? (
-        <p>
-          Your test is running. Please, wait until it finishes. Rabbit?
-          Percentagens
-        </p>
+      {config.cloud.is_deployed ? (
+        loading ? (
+          <p>Loading</p>
+        ) : test ? (
+          <p>
+            Your test is running. Please, wait until it finishes. Rabbit?
+            Percentagens
+          </p>
+        ) : (
+          <p>No tests running</p>
+        )
       ) : (
-        <p>No tests running</p>
+        <>
+          <Typography>Please, deploy your instances first</Typography>
+          <Button onClick={() => onDeploy(null, 1)}>Deploy</Button>
+        </>
       )}
     </>
   );
@@ -410,8 +447,9 @@ const Config = (props) => {
         <AppBar position="static" className={classes.tabs}>
           <Tabs value={tab} onChange={handleTabChange} aria-label="tabs">
             <Tab label="Info" id="tab-0" />
-            <Tab label="Test" id="tab-1" />
-            <Tab label="Results" id="tab-2" />
+            <Tab label="Deploy" id="tab-1" />
+            <Tab label="Test" id="tab-2" />
+            <Tab label="Results" id="tab-3" />
           </Tabs>
         </AppBar>
         {config && (
@@ -419,14 +457,17 @@ const Config = (props) => {
             <TabPanel value={tab} index={0}>
               <Info
                 gateways={config.gateways}
-                clouds={config.clouds}
+                cloud={config.cloud}
                 endpoints={config.endpoints}
               />
             </TabPanel>
             <TabPanel value={tab} index={1}>
-              <Test config_id={config.id} />
+              <Deploy config={config} />
             </TabPanel>
             <TabPanel value={tab} index={2}>
+              <Test onDeploy={handleTabChange} config={config} />
+            </TabPanel>
+            <TabPanel value={tab} index={3}>
               <Results config_id={config.id} />
             </TabPanel>
           </>
@@ -471,12 +512,14 @@ InfoCard.defaultProps = {
 
 Info.propTypes = {
   gateways: PropTypes.array.isRequired,
-  clouds: PropTypes.array.isRequired,
+  cloud: PropTypes.object.isRequired,
   endpoints: PropTypes.array.isRequired,
 };
 
+Deploy.propTypes = {};
+
 Test.propTypes = {
-  config_id: PropTypes.number.isRequired,
+  config: PropTypes.object.isRequired,
 };
 
 Results.propTypes = {
