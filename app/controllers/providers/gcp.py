@@ -1,4 +1,3 @@
-from app.models.cloud import Instance
 import os
 import time
 import threading
@@ -6,6 +5,7 @@ from google.oauth2 import service_account
 import googleapiclient.discovery
 from app import db
 from app.models.config import Config
+from app.models.cloud import Instance
 from app.controllers.providers.deploy import Provider
 import app.controllers.util.templates as templates
 
@@ -42,7 +42,22 @@ class GCP(Provider):
         ).read()
 
     def load_tyk(self, config_id):
-        return templates.get_tyk_config(config_id)
+        return templates.get_tyk_configs(config_id)
+
+    def create_tyk_vars(self, config_id):
+        variables = []
+
+        variables.append(
+            {"key": "startup-script", "value": self.load_startup_script_tyk()}
+        )
+        files = self.load_tyk(config_id)
+
+        for index, file in enumerate(files):
+            variables.append({"key": f"tyk-config-{index}", "value": file})
+
+        variables.append({"key": "tyk-total-files", "value": len(files)})
+
+        return variables
 
     def create_instance(self, compute, project, zone, config_id, gateway):
         # Get Ubuntu image.
@@ -109,10 +124,7 @@ class GCP(Provider):
                     {"key": "kong-config", "value": self.load_kong(config_id)},
                 ]
                 if gateway == "KONG"
-                else [
-                    {"key": "startup-script", "value": self.load_startup_script_tyk()},
-                    {"key": "tyk-config", "value": self.load_tyk(config_id)},
-                ]
+                else self.create_tyk_vars(config_id)
             },
             "tags": {
                 "items": ["http-server", "https-server", "krakend", "kong", "tyk"]

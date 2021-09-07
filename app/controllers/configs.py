@@ -43,11 +43,6 @@ def create_config():
     if not name:
         return error_response(400, "No name provided")
 
-    domain = data.get("domain", None)
-
-    if not domain:
-        return error_response(400, "No domain provided")
-
     endpoints = data.get("endpoints", None)
 
     if not endpoints or len(endpoints) == 0:
@@ -66,7 +61,6 @@ def create_config():
     # Create config and endpoints
     config = Config(
         name=name,
-        domain=domain,
         gateways=[gateway.upper() for gateway in gateways],
         user_id=user_id,
     )
@@ -74,7 +68,8 @@ def create_config():
     for endpoint_data in endpoints:
         try:
             endpoint = Endpoint(
-                path=endpoint_data["path"],
+                base_path=endpoint_data["base_path"],
+                endpoint_path=endpoint_data["endpoint_path"],
                 method=endpoint_data["method"].upper(),
                 query_params=endpoint_data.get("query_params", None),
                 path_params=endpoint_data.get("path_params", None),

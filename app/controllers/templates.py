@@ -1,8 +1,6 @@
-import re
-from flask import jsonify, request, Response
-from flask_jwt_extended import get_jwt_identity
+from flask import Response
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from app import app, db
+from app import app
 from app.models.config import Config
 from app.controllers.util.decorators import validate_user, check_config_ownership
 from app.controllers.util.errors import error_response
@@ -63,10 +61,12 @@ def get_tyk_config(config_id):
     if "TYK" not in config.gateways:
         return error_response(403, "Gateway not valid for the current configuration")
 
-    tyk = templates.get_tyk_config(config_id)
+    tyk = templates.get_tyk_configs_zip(config_id)
 
     return Response(
         tyk,
-        mimetype="text/json",
-        headers={"Content-disposition": "attachment; filename=tyk.json"},
+        headers={
+            "Content-disposition": "attachment; filename=tyk.zip",
+            "Content-Type": "zip",
+        },
     )

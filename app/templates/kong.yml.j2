@@ -2,17 +2,15 @@ _format_version: "2.1"
 _transform: true
 
 services:
-{%- for path in endpoints %}
-{%- set outer_loop = loop %}
-- name: {{path}}
-  url: {{ config.domain + "/" + path }}
+{%- for endpoint in endpoints %}
+- name: {{ "endpoint-" }}{{ loop.index }}
+  url: {{ endpoint.base_path + endpoint.endpoint_path }}
   routes:
-{%- for endpoint in endpoints[path] %}
-  - name: {{ "route-" }}{{ outer_loop.index }}{{ "-" }}{{ loop.index }}
+  - name: {{ "route-" }}{{ loop.index }}
     methods:
-    - {{endpoint.method.value}}
+    - {{ endpoint.method.value }}
     paths:
-    - {{ endpoint.path }}
+    - {{ endpoint.endpoint_path }}
     {%- if endpoint.path_params|length != 0 %}
     regex_priority: {{ endpoint.path_params|length }}
     plugins:
@@ -21,5 +19,4 @@ services:
         replace:
           uri: {{ endpoint.uri }}
     {%- endif %}
-{%- endfor %}
 {%- endfor %}

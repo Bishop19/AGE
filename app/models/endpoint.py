@@ -17,7 +17,8 @@ class Methods(enum.Enum):
 
 class Endpoint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    path = db.Column(db.String(128), nullable=False)
+    base_path = db.Column(db.String(128), nullable=False)
+    endpoint_path = db.Column(db.String(128), nullable=False)
     method = db.Column(db.Enum(Methods), nullable=False)
     query_params = db.Column(db.PickleType)
     path_params = db.Column(db.PickleType)
@@ -27,7 +28,8 @@ class Endpoint(db.Model):
 
     def to_dict(self):
         return {
-            "path": self.path,
+            "base_path": self.base_path,
+            "endpoint_path": self.endpoint_path,
             "method": self.method.value,
             "query_params": self.query_params,
             "path_params": self.path_params,

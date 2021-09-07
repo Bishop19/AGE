@@ -11,10 +11,10 @@
           "white_list": [
             {% for endpoint in endpoints %}
               {
-                  "path": "{{ endpoint.path }}",
+                  "path": "{{ endpoint.endpoint_path }}",
                   "ignore_case": false,
                   "method_actions": {
-                      "{{ endpoint.method }}": {
+                      "{{ endpoint.method.value }}": {
                           "action": "no_action",
                           "code": 200,
                           "data": "",
@@ -29,8 +29,8 @@
     }
   },
   "proxy": {
-    "listen_path": "/",
-    "target_url": "{{ domain }}",
+    "listen_path": "{{ listen_path }}",
+    "target_url": "{{ host }}{{ listen_path }}",
     "strip_listen_path": true
   },
   "active": true

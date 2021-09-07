@@ -3,8 +3,7 @@
 # Setup
 apt-get update
 apt-get install -y apt-transport-https
-TYK_CONFIG=$(curl http://metadata/computeMetadata/v1/instance/attributes/tyk-config -H "Metadata-Flavor: Google")
-
+TYK_TOTAL_FILES=$(curl http://metadata/computeMetadata/v1/instance/attributes/tyk-total-files -H "Metadata-Flavor: Google")
 # Install Redis
 sudo apt-get install -y redis-server
 
@@ -16,7 +15,11 @@ sudo /opt/tyk-gateway/install/setup.sh --listenport=8083 --redishost=tyk --redis
 
 # Copy configurations
 sudo rm /opt/tyk-gateway/apps/*
-echo $TYK_CONFIG > /opt/tyk-gateway/apps/kong.json
+for (( index=1; index<=$TYK_TOTAL_FILES; index++ ))
+do
+    TYK_CONFIG=$(curl http://metadata/computeMetadata/v1/instance/attributes/tyk-config-${index} -H "Metadata-Flavor: Google")
+    echo $TYK_CONFIG > /opt/tyk-gateway/apps/config-${index}.json
+done
 
 # Start Tyk
 sudo service tyk-gateway start
