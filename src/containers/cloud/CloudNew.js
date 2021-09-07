@@ -113,6 +113,10 @@ const GCP = ({ name, region, onNameChange, onFileUpload, onRegionChange }) => {
                     <MenuItem selected="selected" value={'europe-west4-a'}>
                       Europe West 4 A
                     </MenuItem>
+                    <MenuItem value={'europe-west2-c'}>
+                      Europe West 2 C
+                    </MenuItem>
+                    {/* TODO: ADD ZONES */}
                   </Select>
                 </FormControl>
               </Grid>

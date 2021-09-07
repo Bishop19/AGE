@@ -74,7 +74,7 @@ const TabPanel = (props) => {
   );
 };
 
-const InfoCard = ({ name, score, className, downloadable }) => {
+const InfoCard = ({ config_id, name, score, className, downloadable }) => {
   const selectImage = (name) => {
     switch (name.toUpperCase()) {
       case 'GCP':
@@ -107,8 +107,8 @@ const InfoCard = ({ name, score, className, downloadable }) => {
     },
   }))();
 
-  const dowloadGatewayConfig = async (gateway) => {
-    const valid = await configsService.getGatewayConfig(9, gateway);
+  const dowloadGatewayConfig = async (config_id, gateway) => {
+    const valid = await configsService.getGatewayConfig(config_id, gateway);
 
     if (!valid) {
       toast.error('Something went wrong');
@@ -122,7 +122,7 @@ const InfoCard = ({ name, score, className, downloadable }) => {
       })}
       onClick={
         downloadable
-          ? () => dowloadGatewayConfig(name.toLowerCase())
+          ? () => dowloadGatewayConfig(config_id, name.toLowerCase())
           : undefined
       }
     >
@@ -156,7 +156,7 @@ const InfoCard = ({ name, score, className, downloadable }) => {
   );
 };
 
-const Info = ({ gateways, cloud, endpoints }) => {
+const Info = ({ config_id, gateways, cloud, endpoints }) => {
   return (
     <>
       <Box>
@@ -164,7 +164,7 @@ const Info = ({ gateways, cloud, endpoints }) => {
         <Box display="flex">
           {gateways.map((gateway, index) => (
             <Box p={2} key={index}>
-              <InfoCard name={gateway} downloadable />
+              <InfoCard config_id={config_id} name={gateway} downloadable />
             </Box>
           ))}
         </Box>
@@ -456,6 +456,7 @@ const Config = (props) => {
           <>
             <TabPanel value={tab} index={0}>
               <Info
+                config_id={config.id}
                 gateways={config.gateways}
                 cloud={config.cloud}
                 endpoints={config.endpoints}
@@ -500,6 +501,7 @@ Benchmark.propTypes = {
 };
 
 InfoCard.propTypes = {
+  config_id: PropTypes.number,
   name: PropTypes.string.isRequired,
   score: PropTypes.number,
   className: PropTypes.string,
@@ -511,6 +513,7 @@ InfoCard.defaultProps = {
 };
 
 Info.propTypes = {
+  config_id: PropTypes.number,
   gateways: PropTypes.array.isRequired,
   cloud: PropTypes.object.isRequired,
   endpoints: PropTypes.array.isRequired,

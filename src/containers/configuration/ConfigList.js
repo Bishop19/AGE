@@ -59,11 +59,11 @@ const ConfigCard = ({ config }) => {
           <Status state={config.state} />
         </Box>
         <Box display="flex" paddingLeft={2} paddingBottom={1}>
-          <Box flexGrow={1} display="flex" alignItems="center">
+          <Box display="flex" alignItems="center">
             <RoomIcon></RoomIcon>
             <Box pl={1}>{config.endpoints.length}</Box>
           </Box>
-          <Box flexGrow={1} display="flex" alignItems="center">
+          <Box pl={4} display="flex" alignItems="center">
             <InputIcon></InputIcon>
             <Box pl={1}>{config.gateways.length}</Box>
           </Box>
@@ -78,7 +78,7 @@ const Configs = ({ configs }) => {
     <Box marginTop={3}>
       <Grid container spacing={3}>
         {configs.map((config, index) => (
-          <Grid item xs={4} key={index}>
+          <Grid item xs={3} key={index}>
             <ConfigCard config={config} />
           </Grid>
         ))}

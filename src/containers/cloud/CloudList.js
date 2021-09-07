@@ -45,7 +45,7 @@ const Clouds = ({ clouds }) => {
   return (
     <Grid container spacing={3}>
       {clouds.map((cloud, index) => (
-        <Grid item xs={4} key={index}>
+        <Grid item xs={3} key={index}>
           <CloudCard cloud={cloud} />
         </Grid>
       ))}

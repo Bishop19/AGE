@@ -74,10 +74,29 @@ const createConfig = (name, domain, endpoints, gateways, cloud) => {
 };
 
 const getGatewayConfig = (id, gateway) => {
+  let extension, file;
+
+  
   return instance
-    .get(`/configurations/${id}/${gateway}`)
+    .get(`/configurations/${id}/${gateway}`, {
+      responseType: gateway === "tyk" ? 'blob' : ''
+    })
     .then((response) => {
-      fileDownload(JSON.stringify(response.data, undefined, 2), gateway);
+      switch(gateway) {
+        case "krakend":
+          file = JSON.stringify(response.data, undefined, 2)
+          extension = ".json"
+          break;
+        case "kong":
+          file = response.data
+          extension = ".yml"
+          break;
+        case "tyk":
+          file = response.data
+          extension = ".zip"
+          break;
+        }
+        fileDownload(file, gateway+extension);
       return true;
     })
     .catch((error) => {
