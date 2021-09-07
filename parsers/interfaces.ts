@@ -1,5 +1,6 @@
 export interface Endpoint {
-  path: string;
+  base_path: string;
+  endpoint_path: string;
   method: string;
   query_params: Record<string, Param>;
   path_params: Record<string, Param>;
@@ -7,7 +8,6 @@ export interface Endpoint {
 }
 
 export interface Config {
-  domain: string;
   endpoints: Array<Endpoint>;
 }
 

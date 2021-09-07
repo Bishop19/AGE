@@ -6,7 +6,8 @@ export default class APIBlueprintParser implements Parser {
       domain: 'NOT IMPLEMENTED',
       endpoints: [
         {
-          path: 'API Blueprint',
+          base_path: 'API Blueprint',
+          endpoint_path: 'NOT IMPLEMENTED',
           method: 'NOT IMPLEMENTED',
           query_params: {},
           path_params: {},

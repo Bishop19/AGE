@@ -1,0 +1,1003 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "BIWI",
+    "description": "BIWI backend documentation.",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "Active",
+      "description": "Active auctions service"
+    },
+    {
+      "name": "Closed",
+      "description": "Closed auctions service"
+    },
+    {
+      "name": "Description",
+      "description": "Auctions' description service"
+    },
+    {
+      "name": "Scheduled",
+      "description": "Scheduled auctions service"
+    },
+    {
+      "name": "Categories",
+      "description": "Categories service"
+    },
+    {
+      "name": "Users",
+      "description": "Users service"
+    }
+  ],
+  "paths": {
+    "/users/register": {
+      "post": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:12000/"
+          }
+        ],
+        "tags": [
+          "Users"
+        ],
+        "summary": "Registers a user",
+        "operationId": "registerUser",
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:12000/"
+          }
+        ],
+        "tags": [
+          "Users"
+        ],
+        "summary": "Logins a user",
+        "operationId": "loginUser",
+        "requestBody": {
+          "description": "Configuration object that needs to be created",
+          "content": {},
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/users/user": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:12000/"
+          }
+        ],
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get current user",
+        "operationId": "getUser",
+        "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/user/{userID}": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:12000/"
+          }
+        ],
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user by ID",
+        "operationId": "getUserByID",
+        "parameters": [
+          {
+            "name": "userID",
+            "in": "path",
+            "description": "ID of the configuration",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/user/watchlist": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:12000/"
+          }
+        ],
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get current user's watchlist",
+        "operationId": "getUserWatchlist",
+        "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:12000/"
+          }
+        ],
+        "tags": [
+          "Users"
+        ],
+        "summary": "Adds item to current user's watchlist",
+        "operationId": "addToUserWatchlist",
+        "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/user/watchlist/{auctionID}": {
+      "delete": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:12000/"
+          }
+        ],
+        "tags": [
+          "Users"
+        ],
+        "summary": "Deletes auction from current user's watchlist",
+        "operationId": "deleteAuctionUserWatchlist",
+        "parameters": [
+          {
+            "name": "auctionID",
+            "in": "path",
+            "description": "ID of the auction",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/watchlist/{auctionID}": {
+      "delete": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:12000/"
+          }
+        ],
+        "tags": [
+          "Users"
+        ],
+        "summary": "Deletes auction from all user's watchlist",
+        "operationId": "deleteAuctionAllUserWatchlist",
+        "parameters": [
+          {
+            "name": "auctionID",
+            "in": "path",
+            "description": "ID of the auction",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/user/review/{userID}": {
+      "post": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:12000/"
+          }
+        ],
+        "tags": [
+          "Users"
+        ],
+        "summary": "Adds a review to a user",
+        "operationId": "addReview",
+        "parameters": [
+          {
+            "name": "userID",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/refresh": {
+      "post": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:12000/"
+          }
+        ],
+        "tags": [
+          "Users"
+        ],
+        "summary": "Refresh token",
+        "operationId": "refreshToken",
+        "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/active/{auctionID}": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:14000/"
+          }
+        ],
+        "tags": [
+          "Active"
+        ],
+        "summary": "Gets an active auction with the given id",
+        "description": "Given an id, retrieves the auction",
+        "operationId": "getAuction",
+        "parameters": [
+          {
+            "name": "auctionID",
+            "in": "path",
+            "description": "ID of the auction",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/active/all": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:14000/"
+          }
+        ],
+        "tags": [
+          "Active"
+        ],
+        "summary": "Gets all active auctions",
+        "description": "Retrieves the active auctions",
+        "operationId": "getAuctions",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/active/hotpicks": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:14000/"
+          }
+        ],
+        "tags": [
+          "Active"
+        ],
+        "summary": "Gets all hotpicks of active auctions",
+        "description": "Retrieves the hoticks auctions",
+        "operationId": "getHotpicksAuctions",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/active/bid/{auctionID}": {
+      "post": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:14000/"
+          }
+        ],
+        "tags": [
+          "Active"
+        ],
+        "summary": "Adds a new bid to a given auction",
+        "operationId": "addBid",
+        "parameters": [
+          {
+            "name": "auctionID",
+            "in": "path",
+            "description": "ID of the auction",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/active/remove/{auctionID}": {
+      "delete": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:14000/"
+          }
+        ],
+        "tags": [
+          "Active"
+        ],
+        "summary": "Deletes a given auction",
+        "operationId": "deleteAuction",
+        "parameters": [
+          {
+            "name": "auctionID",
+            "in": "path",
+            "description": "ID of the auction",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/description/{auctionID}": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:10000/"
+          }
+        ],
+        "tags": [
+          "Description"
+        ],
+        "summary": "Gets full info of a given auction",
+        "operationId": "getAuctionInfo",
+        "parameters": [
+          {
+            "name": "auctionID",
+            "in": "path",
+            "description": "ID of the auction",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/description/{auctionID}/short": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:10000/"
+          }
+        ],
+        "tags": [
+          "Description"
+        ],
+        "summary": "Gets short info of a given auction",
+        "operationId": "getAuctionShortInfo",
+        "parameters": [
+          {
+            "name": "auctionID",
+            "in": "path",
+            "description": "ID of the auction",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/scheduled/schedule": {
+      "post": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:11000/"
+          }
+        ],
+        "tags": [
+          "Scheduled"
+        ],
+        "summary": "Creates a new auction",
+        "operationId": "createAuction",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/scheduled/soon": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:11000/"
+          }
+        ],
+        "tags": [
+          "Scheduled"
+        ],
+        "summary": "Gets upcoming auctions (soon)",
+        "operationId": "getSoonUpcomingAuctions",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/scheduled/all": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:11000/"
+          }
+        ],
+        "tags": [
+          "Scheduled"
+        ],
+        "summary": "Gets upcoming auctions",
+        "operationId": "getUpcomingAuctions",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/categories/{categoryID}": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:13000/"
+          }
+        ],
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Get category information",
+        "operationId": "getCategory",
+        "parameters": [
+          {
+            "name": "categoryID",
+            "in": "path",
+            "description": "ID of the category",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/categories": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:13000/"
+          }
+        ],
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Get categories information",
+        "operationId": "getCategories",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      },
+      "post": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:13000/"
+          }
+        ],
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Creates category",
+        "operationId": "createCategory",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      },
+      "put": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:13000/"
+          }
+        ],
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Edits category",
+        "operationId": "editCategory",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      },
+      "delete": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:13000/"
+          }
+        ],
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Deletes category",
+        "operationId": "deleteCategory",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/closed/auction/{auctionID}": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:15000/"
+          }
+        ],
+        "tags": [
+          "Closed"
+        ],
+        "summary": "Get closed auction",
+        "operationId": "getClosedAuction",
+        "parameters": [
+          {
+            "name": "auctionID",
+            "in": "path",
+            "description": "ID of the auction",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/closed/user": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:15000/"
+          }
+        ],
+        "tags": [
+          "Closed"
+        ],
+        "summary": "Get user's closed auctions",
+        "operationId": "getUserClosedAuction",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/closed/user/{userID}": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:15000/"
+          }
+        ],
+        "tags": [
+          "Closed"
+        ],
+        "summary": "Get user's closed auctions with a given ID",
+        "operationId": "getUserIDClosedAuction",
+        "parameters": [
+          {
+            "name": "userID",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/closed/review/{auctionID}": {
+      "post": {
+        "servers": [
+          {
+            "url": "http://34.142.97.91:15000/"
+          }
+        ],
+        "tags": [
+          "Closed"
+        ],
+        "summary": "Adds a review to the auction with a given ID",
+        "operationId": "addReviewAuction",
+        "parameters": [
+          {
+            "name": "auctionID",
+            "in": "path",
+            "description": "ID of the auction",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

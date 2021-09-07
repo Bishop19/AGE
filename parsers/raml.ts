@@ -6,7 +6,8 @@ export default class RAMLParser implements Parser {
       domain: 'NOT IMPLEMENTED',
       endpoints: [
         {
-          path: 'RAML',
+          base_path: 'RAML',
+          endpoint_path: 'NOT IMPLEMENTED',
           method: 'NOT IMPLEMENTED',
           query_params: {},
           path_params: {},
