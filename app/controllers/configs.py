@@ -1,5 +1,3 @@
-from app.controllers.providers.gcp import GCP
-from app.controllers.providers.deploy import Deploy
 from flask import jsonify, request
 from flask_jwt_extended import get_jwt_identity
 from app import app, db
@@ -7,6 +5,8 @@ from app.models.config import Config, ConfigCloud
 from app.models.endpoint import Endpoint
 from app.models.user import User
 from app.models.cloud import Cloud
+from app.controllers.providers.gcp import GCP
+from app.controllers.providers.deploy import Deploy
 from app.controllers.util.decorators import validate_user, check_config_ownership
 from app.controllers.util.errors import error_response
 
@@ -126,7 +126,7 @@ def deploy_gateways(config_id):
     deploy = Deploy(GCP())
     deploy.deploy(
         "api-gateway-picker",
-        "europe-west4-a",
+        "europe-west4-a",  # TODO
         config.cloud.credentials,
         config.id,
         config.gateways,

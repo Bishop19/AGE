@@ -21,16 +21,26 @@ class ConfigCloud(db.Model):
         return self.cloud.provider.credentials
 
 
+class TestFile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    config_id = db.Column(db.Integer, db.ForeignKey("config.id"))
+
+    def to_dict(self):
+        return {"id": self.id, "name": self.name, "content": self.content}
+
+
 class Config(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
-    domain = db.Column(db.String(128), nullable=False)
     _gateways = db.Column(db.String, nullable=False, default="[]")
     endpoints = db.relationship("Endpoint", lazy="dynamic")
     tests = db.relationship("Test", lazy="dynamic")
     cloud = db.relationship("ConfigCloud", back_populates="config", uselist=False)
     instances = db.relationship("Instance", lazy="dynamic")
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    test_files = db.relationship("TestFile", lazy="dynamic")
 
     @property
     def gateways(self):
@@ -45,7 +55,6 @@ class Config(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "domain": self.domain,
             "instances": [
                 instance.to_dict() for instance in self.instances.all()
             ],  # TODO: INSERIR NA CLOUD?
@@ -58,6 +67,7 @@ class Config(db.Model):
             "gateways": self.gateways,
             "endpoints": [endpoint.to_dict() for endpoint in self.endpoints.all()],
             "tests": [test.to_dict() for test in self.tests.all()],
+            "test_files": [test_file.to_dict() for test_file in self.test_files.all()],
         }
 
     def __repr__(self):

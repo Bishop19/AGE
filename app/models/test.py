@@ -1,5 +1,6 @@
 # pylint: disable=E1101
 from app import db
+from app.models.config import TestFile
 
 
 class Test(db.Model):
@@ -7,12 +8,14 @@ class Test(db.Model):
     results = db.relationship("Result", lazy="dynamic")
     is_finished = db.Column(db.Boolean, default=False)
     config_id = db.Column(db.Integer, db.ForeignKey("config.id"))
+    test_file_id = db.Column(db.Integer, db.ForeignKey("test_file.id"))
 
     def to_dict(self):
         return {
             "id": self.id,
             "is_finished": self.is_finished,
             "results": [result.to_dict() for result in self.results.all()],
+            "test_file": TestFile.query.get(self.test_file_id).to_dict(),
         }
 
     def __repr__(self):

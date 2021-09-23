@@ -254,3 +254,6 @@ class GCP(Provider):
             ),
         )
         thread.start()
+
+
+# TODO: VERIFY IF INSTANCES EXIST
