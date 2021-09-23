@@ -1,6 +1,6 @@
 import os
 import re
-from app.controllers.testing.load_test import Tool
+from app.controllers.tests.tools.load_test import Tool
 
 
 class JMeter(Tool):

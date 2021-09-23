@@ -1,10 +1,12 @@
-from app import app, db
+from app import create_app, db
 from app.models.user import User
 from app.models.config import Config, ConfigCloud
 from app.models.endpoint import Endpoint
 from app.models.cloud import Cloud, Instance, Provider
 from app.models.test import Test
 from app.models.result import Result
+
+app = create_app()
 
 
 @app.shell_context_processor

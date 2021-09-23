@@ -1,11 +1,12 @@
 from flask import request, jsonify
 from flask_jwt_extended import create_access_token
-from app import app, db
+from app import db
+from app.controllers.auth import bp
 from app.controllers.util.errors import error_response
 from app.models.user import User
 
 
-@app.route("/auth", methods=["POST"])
+@bp.route("/auth", methods=["POST"])
 def login():
     data = request.get_json() or {}
 
@@ -31,7 +32,7 @@ def login():
     return jsonify(access_token=access_token), 200
 
 
-@app.route("/register", methods=["POST"])
+@bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json() or {}
 

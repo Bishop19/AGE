@@ -1,7 +1,7 @@
 from flask import Response
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from app import app
 from app.models.config import Config
+from app.controllers.templates import bp
 from app.controllers.util.decorators import validate_user, check_config_ownership
 from app.controllers.util.errors import error_response
 import app.controllers.util.templates as templates
@@ -13,7 +13,7 @@ env = Environment(
 )
 
 
-@app.route("/configurations/<int:config_id>/krakend", methods=["GET"])
+@bp.route("/configurations/<int:config_id>/krakend", methods=["GET"])
 @validate_user()
 @check_config_ownership()
 def get_krakend_config(config_id):
@@ -32,7 +32,7 @@ def get_krakend_config(config_id):
     )
 
 
-@app.route("/configurations/<int:config_id>/kong", methods=["GET"])
+@bp.route("/configurations/<int:config_id>/kong", methods=["GET"])
 @validate_user()
 @check_config_ownership()
 def get_kong_config(config_id):
@@ -51,7 +51,7 @@ def get_kong_config(config_id):
     )
 
 
-@app.route("/configurations/<int:config_id>/tyk", methods=["GET"])
+@bp.route("/configurations/<int:config_id>/tyk", methods=["GET"])
 @validate_user()
 @check_config_ownership()
 def get_tyk_config(config_id):

@@ -3,18 +3,19 @@ import csv
 from random import randint
 from flask import json, jsonify, request
 from flask_jwt_extended.utils import create_access_token, get_jwt_identity
-from app import app, db
+from app import db
 from app.models.config import Config, TestFile
 from app.models.user import User
 from app.models.test import Test
 from app.models.result import Result
-from app.controllers.testing.jmeter import JMeter
-from app.controllers.testing.load_test import LoadTest
+from app.controllers.tests import bp
+from app.controllers.tests.tools.jmeter import JMeter
+from app.controllers.tests.tools.load_test import LoadTest
 from app.controllers.util.decorators import validate_user, check_config_ownership
 from app.controllers.util.errors import error_response
 
 
-@app.route("/configurations/<int:config_id>/tests", methods=["GET"])
+@bp.route("/configurations/<int:config_id>/tests", methods=["GET"])
 @validate_user()
 @check_config_ownership()
 def get_tests(config_id):
@@ -31,7 +32,7 @@ def get_tests(config_id):
     return jsonify(res)
 
 
-@app.route("/configurations/<int:config_id>/tests", methods=["POST"])
+@bp.route("/configurations/<int:config_id>/tests", methods=["POST"])
 @validate_user()
 @check_config_ownership()
 def create_test(config_id):
@@ -78,7 +79,7 @@ def create_test(config_id):
     return jsonify(test.to_dict())
 
 
-@app.route("/configurations/<int:config_id>/tests/<int:test_id>", methods=["GET"])
+@bp.route("/configurations/<int:config_id>/tests/<int:test_id>", methods=["GET"])
 @validate_user()
 @check_config_ownership()
 def get_test(config_id, test_id):
@@ -119,7 +120,7 @@ def get_results_from_data(data):
     return results
 
 
-@app.route("/configurations/<int:config_id>/tests/<int:test_id>", methods=["PUT"])
+@bp.route("/configurations/<int:config_id>/tests/<int:test_id>", methods=["PUT"])
 @validate_user()
 @check_config_ownership()
 def test_results(config_id, test_id):
@@ -165,7 +166,7 @@ def test_results(config_id, test_id):
     return jsonify(test.to_dict())
 
 
-@app.route("/configurations/<int:config_id>/tests/running", methods=["GET"])
+@bp.route("/configurations/<int:config_id>/tests/running", methods=["GET"])
 @validate_user()
 @check_config_ownership()
 def get_running_test(config_id):
@@ -181,7 +182,7 @@ def get_running_test(config_id):
     return jsonify(test.to_dict())
 
 
-@app.route("/configurations/<int:config_id>/tests/finished", methods=["GET"])
+@bp.route("/configurations/<int:config_id>/tests/finished", methods=["GET"])
 @validate_user()
 @check_config_ownership()
 def get_finished_tests(config_id):
@@ -198,7 +199,7 @@ def get_finished_tests(config_id):
     return jsonify(res)
 
 
-@app.route("/configurations/<int:config_id>/tests/file", methods=["POST"])
+@bp.route("/configurations/<int:config_id>/tests/file", methods=["POST"])
 @validate_user()
 @check_config_ownership()
 def add_test_file(config_id):

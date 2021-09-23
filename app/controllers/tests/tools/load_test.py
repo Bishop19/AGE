@@ -1,5 +1,4 @@
 import os
-from random import randint
 import time
 import json
 import threading

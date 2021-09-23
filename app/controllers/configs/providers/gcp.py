@@ -6,7 +6,7 @@ import googleapiclient.discovery
 from app import db
 from app.models.config import Config
 from app.models.cloud import Instance
-from app.controllers.providers.deploy import Provider
+from app.controllers.configs.providers.deploy import Provider
 import app.controllers.util.templates as templates
 
 

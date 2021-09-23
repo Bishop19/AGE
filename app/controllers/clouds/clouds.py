@@ -1,13 +1,14 @@
 from flask import jsonify, request
 from flask_jwt_extended import get_jwt_identity
-from app import app, db
+from app import db
 from app.models.cloud import Cloud, Provider
 from app.models.user import User
+from app.controllers.clouds import bp
 from app.controllers.util.errors import error_response
 from app.controllers.util.decorators import validate_user
 
 
-@app.route("/clouds", methods=["GET"])
+@bp.route("/clouds", methods=["GET"])
 @validate_user()
 def get_clouds():
     user_id = get_jwt_identity()["id"]
@@ -23,7 +24,7 @@ def get_clouds():
     return jsonify(res)
 
 
-@app.route("/clouds", methods=["POST"])
+@bp.route("/clouds", methods=["POST"])
 @validate_user()
 def create_cloud():
     user_id = get_jwt_identity()["id"]
@@ -62,7 +63,7 @@ def create_cloud():
     return jsonify(cloud.to_dict())
 
 
-@app.route("/clouds/<int:cloud_id>", methods=["GET"])
+@bp.route("/clouds/<int:cloud_id>", methods=["GET"])
 @validate_user()
 def get_cloud(cloud_id):
     user_id = get_jwt_identity()["id"]
@@ -78,7 +79,7 @@ def get_cloud(cloud_id):
     return jsonify(cloud.to_dict())
 
 
-# @app.route("/clouds/<int:cloud_id>", methods=["POST"])
+# @bp.route("/clouds/<int:cloud_id>", methods=["POST"])
 # @validate_user()
 # def edit_cloud(cloud_id):
 #     data = request.get_json() or {}

@@ -1,17 +1,18 @@
 from flask import jsonify, request
 from flask_jwt_extended import get_jwt_identity
-from app import app, db
+from app import db
 from app.models.config import Config, ConfigCloud
 from app.models.endpoint import Endpoint
 from app.models.user import User
 from app.models.cloud import Cloud
-from app.controllers.providers.gcp import GCP
-from app.controllers.providers.deploy import Deploy
+from app.controllers.configs import bp
+from app.controllers.configs.providers.gcp import GCP
+from app.controllers.configs.providers.deploy import Deploy
 from app.controllers.util.decorators import validate_user, check_config_ownership
 from app.controllers.util.errors import error_response
 
 
-@app.route("/configurations", methods=["GET"])
+@bp.route("/configurations", methods=["GET"])
 @validate_user()
 def get_configs():
     # Check user
@@ -29,7 +30,7 @@ def get_configs():
     return jsonify(res)
 
 
-@app.route("/configurations", methods=["POST"])
+@bp.route("/configurations", methods=["POST"])
 @validate_user()
 def create_config():
     # Check user
@@ -96,7 +97,7 @@ def create_config():
     return jsonify(config.to_dict())
 
 
-@app.route("/configurations/<int:config_id>", methods=["GET"])
+@bp.route("/configurations/<int:config_id>", methods=["GET"])
 @validate_user()
 @check_config_ownership()
 def get_config(config_id):
@@ -106,7 +107,7 @@ def get_config(config_id):
     return jsonify(config.to_dict())
 
 
-# @app.route("/configurations/<int:config_id>", methods=["POST"])
+# @bp.route("/configurations/<int:config_id>", methods=["POST"])
 # @validate_user()
 # def edit_config(config_id):
 #     data = request.get_json() or {}
@@ -116,7 +117,7 @@ def get_config(config_id):
 #     return f"edit config {config_id}"
 
 
-@app.route("/configurations/<int:config_id>/deploy", methods=["POST"])
+@bp.route("/configurations/<int:config_id>/deploy", methods=["POST"])
 @validate_user()
 @check_config_ownership()
 def deploy_gateways(config_id):
