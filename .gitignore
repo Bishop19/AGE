@@ -3,7 +3,6 @@
 .flaskenv
 *__pycache*
 app.db
-migrations
 tests/app_test.db
 venv
 htmlcov

@@ -150,12 +150,7 @@ class LoadTest:
     def deploy(self):
         project = os.getenv("CLOUD_PROJECT")
         zone = os.getenv("CLOUD_ZONE")
-        account = json.load(
-            open(
-                os.getenv("CLOUD_CREDENTIALS"),
-                "r",
-            )
-        )
+        account = json.loads(os.getenv("CLOUD_CREDENTIALS"))
 
         startup_script = self._tool.get_startup_script()
 

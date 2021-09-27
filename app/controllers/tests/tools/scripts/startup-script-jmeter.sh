@@ -81,4 +81,4 @@ curl \
 -H "Authorization: Bearer $TOKEN" \
 -H "Content-Type: application/json" \
 -d "$(generate_post_data)" \
-"http://127.0.0.1:5000/configurations/$CONFIG_ID/tests/$TEST_ID" # TODO: CHANGE IP
+"https://agp-config-manager.herokuapp.com/configurations/$CONFIG_ID/tests/$TEST_ID" # TODO: CHANGE IP
