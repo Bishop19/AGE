@@ -49,8 +49,18 @@ def create_test(config_id):
     if not test_file:
         return error_response(400, "No test file selected")
 
+    machine_type = data.get("machine_type") or None
+
+    if not machine_type:
+        return error_response(400, "No machine type provided")
+
     # Create test
-    test = Test(is_finished=False, config_id=config_id, test_file_id=test_file["id"])
+    test = Test(
+        is_finished=False,
+        machine_type=machine_type,
+        config_id=config_id,
+        test_file_id=test_file["id"],
+    )
 
     # Get JWT to post test results
     user_id = get_jwt_identity()["id"]
@@ -73,6 +83,7 @@ def create_test(config_id):
         config_id=config_id,
         test_id=test.id,
         instances=config.instances.all(),
+        machine_type=test.machine_type,
     )
     tool.deploy()
 

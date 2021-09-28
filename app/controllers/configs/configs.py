@@ -126,11 +126,12 @@ def deploy_gateways(config_id):
 
     deploy = Deploy(GCP())
     deploy.deploy(
-        "api-gateway-picker",
-        "europe-west4-a",  # TODO
+        config.cloud.credentials["project_id"],
+        config.cloud.cloud.provider.region,
         config.cloud.credentials,
         config.id,
         config.gateways,
+        config.cloud.cloud.machine_type,
     )
 
     return jsonify(config.to_dict())

@@ -53,6 +53,7 @@ class Cloud(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), nullable=False)
     provider = db.relationship("Provider", uselist=False)
+    machine_type = db.Column(db.String(64), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     def to_dict(self):
@@ -60,6 +61,7 @@ class Cloud(db.Model):
             "id": self.id,
             "name": self.name,
             "provider": self.provider.to_dict(),
+            "machine_type": self.machine_type,
             "user_id": self.user_id,
         }
 

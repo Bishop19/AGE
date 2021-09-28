@@ -13,13 +13,13 @@ class Tool(ABC):
         pass
 
     @abstractmethod
-    def prepare_test_file(self, test_file, ip):
+    def prepare_test_file(self, test_file, ip, port):
         pass
 
 
 class LoadTest:
     def __init__(
-        self, tool: Tool, test_file, token, config_id, test_id, instances
+        self, tool: Tool, test_file, token, config_id, test_id, instances, machine_type
     ) -> None:
         self._tool = tool
         self.test_file = test_file
@@ -27,6 +27,7 @@ class LoadTest:
         self.config_id = config_id
         self.test_id = test_id
         self.instances = instances
+        self.machine_type = machine_type
 
     @property
     def tool(self) -> Tool:
@@ -65,9 +66,7 @@ class LoadTest:
         source_disk_image = image_response["selfLink"]
 
         # Configure the machine
-        machine_type = (
-            "zones/%s/machineTypes/n2-standard-2" % zone
-        )  # TODO : change machine type
+        machine_type = f"zones/{zone}/machineTypes/{self.machine_type}"
 
         config = {
             "name": "load-tester-" + str(self.config_id) + "-" + str(self.test_id),
@@ -128,10 +127,14 @@ class LoadTest:
         ]
 
         for instance in self.instances:
+            gateway = instance.gateway.lower()
+            port = 8081 if gateway == "krakend" else 8082 if gateway == "kong" else 8083
             items.append(
                 {
-                    "key": f"test-file-{instance.gateway.lower()}",
-                    "value": self._tool.prepare_test_file(self.test_file, instance.ip),
+                    "key": f"test-file-{gateway}",
+                    "value": self._tool.prepare_test_file(
+                        self.test_file, instance.ip, port
+                    ),
                 }
             )
 

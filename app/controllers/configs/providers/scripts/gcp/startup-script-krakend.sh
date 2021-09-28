@@ -15,4 +15,4 @@ apt-get install -y krakend
 echo $KRAKEND_CONFIG > /etc/krakend/krakend.json
 
 # Start KrakenD
-krakend run -c /etc/krakend/krakend.json -d
+krakend run -c /etc/krakend/krakend.json -d --port 8081

@@ -53,8 +53,13 @@ def create_cloud():
     if not region:
         return error_response(400, "No region provided")
 
+    machine_type = data.get("machine_type", None)
+
+    if not machine_type:
+        return error_response(400, "No machine type provided")
+
     provider = Provider(name=provider.upper(), credentials=key, region=region)
-    cloud = Cloud(name=name, provider=provider)
+    cloud = Cloud(name=name, provider=provider, machine_type=machine_type)
     user.clouds.append(cloud)
 
     db.session.add(user)

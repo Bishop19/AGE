@@ -11,8 +11,6 @@ db = SQLAlchemy()
 jwt = JWTManager()
 migrate = Migrate()
 
-db.metadata.clear()
-
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -34,7 +32,5 @@ def create_app(config_class=Config):
     app.register_blueprint(configs_bp)
     app.register_blueprint(tests_bp)
     app.register_blueprint(templates_bp)
-
-    db.metadata.clear()
 
     return app

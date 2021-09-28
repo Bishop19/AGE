@@ -3,7 +3,7 @@ import time
 import threading
 from google.oauth2 import service_account
 import googleapiclient.discovery
-from app import db
+from app import create_app, db
 from app.models.config import Config
 from app.models.cloud import Instance
 from app.controllers.configs.providers.deploy import Provider
@@ -59,7 +59,7 @@ class GCP(Provider):
 
         return variables
 
-    def create_instance(self, compute, project, zone, config_id, gateway):
+    def create_instance(self, compute, project, zone, config_id, gateway, machine_type):
         # Get Ubuntu image.
         image_response = (
             compute.images()
@@ -69,12 +69,10 @@ class GCP(Provider):
         source_disk_image = image_response["selfLink"]
 
         # Configure the machine
-        machine_type = (
-            "zones/%s/machineTypes/n1-standard-1" % zone
-        )  # TODO : change machine type
+        machine_type = f"zones/{zone}/machineTypes/{machine_type}"
 
         config = {
-            "name": "instance-" + gateway.lower(),
+            "name": f"instance-{config_id}-{gateway.lower()}",
             "machineType": machine_type,
             # Specify the boot disk and the image to use as a source.
             "disks": [
@@ -201,7 +199,7 @@ class GCP(Provider):
                     .get(
                         project=project,
                         zone=zone,
-                        instance=f"instance-{gateway.lower()}",
+                        instance=f"instance-{config.id}-{gateway.lower()}",
                     )
                     .execute()
                 )
@@ -219,25 +217,29 @@ class GCP(Provider):
 
             time.sleep(1)
 
-    def cloud_operations(self, compute, project, zone, config_id, gateways):
-        print("Cloud operations started")
-        config = Config.query.get(config_id)
+    def cloud_operations(
+        self, compute, project, zone, config_id, gateways, machine_type
+    ):
+        with create_app().app_context():
+            print("Cloud operations started")
+            config = Config.query.get(config_id)
 
-        self.create_firewall_rules(compute, project)
+            self.create_firewall_rules(compute, project)
 
-        for gateway in gateways:
-            operation = self.create_instance(compute, project, zone, config_id, gateway)
-            self.wait_for_operation(
-                compute, project, zone, operation["name"], config, gateway
-            )
-
-        config.cloud.is_deployed = True  # TODO : set false on delete
-        db.session.add(config)
-        db.session.commit()
+            for gateway in gateways:
+                operation = self.create_instance(
+                    compute, project, zone, config_id, gateway, machine_type
+                )
+                self.wait_for_operation(
+                    compute, project, zone, operation["name"], config, gateway
+                )
+            config.cloud.is_deployed = True  # TODO : set false on delete
+            db.session.add(config)
+            db.session.commit()
 
         print("Cloud operations finished")
 
-    def deploy(self, project, zone, account, config, gateways):
+    def deploy(self, project, zone, account, config, gateways, machine_type):
         credentials = service_account.Credentials.from_service_account_info(account)
         compute = googleapiclient.discovery.build(
             "compute", "v1", credentials=credentials
@@ -245,13 +247,7 @@ class GCP(Provider):
 
         thread = threading.Thread(
             target=self.cloud_operations,
-            args=(
-                compute,
-                project,
-                zone,
-                config,
-                gateways,
-            ),
+            args=(compute, project, zone, config, gateways, machine_type),
         )
         thread.start()
 

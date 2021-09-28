@@ -15,7 +15,7 @@ sudo /opt/tyk-gateway/install/setup.sh --listenport=8083 --redishost=tyk --redis
 
 # Copy configurations
 sudo rm /opt/tyk-gateway/apps/*
-for (( index=1; index<=$TYK_TOTAL_FILES; index++ ))
+for (( index=0; index<$TYK_TOTAL_FILES; index++ ))
 do
     TYK_CONFIG=$(curl http://metadata/computeMetadata/v1/instance/attributes/tyk-config-${index} -H "Metadata-Flavor: Google")
     echo $TYK_CONFIG > /opt/tyk-gateway/apps/config-${index}.json
