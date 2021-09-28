@@ -230,6 +230,7 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
   const [name, setName] = useState('');
   const [file, setFile] = useState(null);
   const [is_visible, setIsVisible] = useState(false);
+  const [machine_type, setMachineType] = useState('n2-standard-2');
 
   useEffect(() => {
     const fetchRunningTest = async () => {
@@ -251,7 +252,11 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
   };
 
   const handleStartClick = async () => {
-    const valid = await testsService.createTest(config.id, test_file);
+    const valid = await testsService.createTest(
+      config.id,
+      test_file,
+      machine_type
+    );
 
     if (valid) {
       setTest(true);
@@ -338,21 +343,46 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
                 </Grid>
               </Box>
             )}
-            <FormControl variant="outlined" style={{ width: '100%' }}>
-              <Select
-                value={test_file}
-                onChange={(event) => handleTestFileChange(event.target.value)}
-              >
-                <MenuItem selected="selected" value={false}>
-                  -
-                </MenuItem>
-                {config.test_files.map((file, index) => (
-                  <MenuItem key={index} value={file}>
-                    {file.name}
+            <Grid item xs={2}>
+              Test File
+            </Grid>
+            <Grid item xs={10}>
+              <FormControl variant="outlined" style={{ width: '100%' }}>
+                <Select
+                  value={test_file}
+                  onChange={(event) => handleTestFileChange(event.target.value)}
+                >
+                  <MenuItem selected="selected" value={false}>
+                    -
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                  {config.test_files.map((file, index) => (
+                    <MenuItem key={index} value={file}>
+                      {file.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={2}>
+              Machine Type
+            </Grid>
+            <Grid item xs={10}>
+              <FormControl variant="outlined" style={{ width: '100%' }}>
+                <Select
+                  value={machine_type}
+                  onChange={(event) => setMachineType(event.target.value)}
+                >
+                  <MenuItem selected="selected" value={'n2-standard-2'}>
+                    N2 Standard 2 (2 CPU, 8GB RAM)
+                  </MenuItem>
+                  <MenuItem value={'e2-standard-2'}>
+                    E2 Standard 2 (2 CPU, 8GB RAM)
+                  </MenuItem>
+                  {/* TODO: ADD MACHINE TYPES */}
+                </Select>
+              </FormControl>
+            </Grid>
             <Button disabled={!can_start} onClick={handleStartClick}>
               Start
             </Button>

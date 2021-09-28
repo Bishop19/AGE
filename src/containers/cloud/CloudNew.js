@@ -66,7 +66,15 @@ const CloudCard = ({ cloud, onSelect }) => {
   );
 };
 
-const GCP = ({ name, region, onNameChange, onFileUpload, onRegionChange }) => {
+const GCP = ({
+  name,
+  region,
+  machine_type,
+  onNameChange,
+  onFileUpload,
+  onRegionChange,
+  onMachineTypeChange,
+}) => {
   return (
     <Box py={2}>
       <Typography variant="h5">Cloud information</Typography>
@@ -120,6 +128,27 @@ const GCP = ({ name, region, onNameChange, onFileUpload, onRegionChange }) => {
                   </Select>
                 </FormControl>
               </Grid>
+              <Grid item xs={2}>
+                Machine Type
+              </Grid>
+              <Grid item xs={10}>
+                <FormControl variant="outlined" style={{ width: '100%' }}>
+                  <Select
+                    value={machine_type}
+                    onChange={(event) =>
+                      onMachineTypeChange(event.target.value)
+                    }
+                  >
+                    <MenuItem selected="selected" value={'n2-standard-2'}>
+                      N2 Standard 2 (2 CPU, 8GB RAM)
+                    </MenuItem>
+                    <MenuItem value={'n2-standard-4'}>
+                      N2 Standard 4 (4 CPU, 16GB RAM)
+                    </MenuItem>
+                    {/* TODO: ADD MACHINE TYPES */}
+                  </Select>
+                </FormControl>
+              </Grid>
             </Grid>
           </Box>
         </Box>
@@ -139,6 +168,7 @@ const CloudNew = () => {
   const [file, setFile] = useState();
   const [region, setRegion] = useState('europe-west4-a');
   const [name, setName] = useState('');
+  const [machine_type, setMachineType] = useState('n2-standard-2');
 
   const handleCloudSelect = (index) => {
     clouds.forEach((c, i) => {
@@ -157,7 +187,13 @@ const CloudNew = () => {
     setSubmitting(true);
 
     const provider = clouds.filter((c) => c.is_selected)[0].name;
-    const cloud = await cloudsService.createCloud(name, file, provider, region);
+    const cloud = await cloudsService.createCloud(
+      name,
+      file,
+      provider,
+      region,
+      machine_type
+    );
 
     if (cloud) {
       // TODO
@@ -208,9 +244,11 @@ const CloudNew = () => {
       <GCP
         name={name}
         region={region}
+        machine_type={machine_type}
         onNameChange={setName}
         onRegionChange={setRegion}
         onFileUpload={parseFile}
+        onMachineTypeChange={setMachineType}
       />
 
       {/* <Box py={2}>
