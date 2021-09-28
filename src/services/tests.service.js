@@ -41,9 +41,9 @@ const getTest = (config_id, test_id) => {
     });
 };
 
-const createTest = (config_id) => {
+const createTest = (config_id, test_file) => {
   return instance
-    .post(`/configurations/${config_id}/tests`, {})
+    .post(`/configurations/${config_id}/tests`, { test_file })
     .then((response) => {
       return response.data;
     })
@@ -78,10 +78,23 @@ const getFinishedTests = (config_id) => {
     });
 };
 
+const addTestFile = (config_id, name, file) => {
+  return instance
+    .post(`/configurations/${config_id}/tests/file`, { name, file })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.error('Error:', error.response?.data);
+      return [];
+    });
+};
+
 export default {
   getTests,
   getTest,
   createTest,
   getRunningTest,
   getFinishedTests,
+  addTestFile,
 };

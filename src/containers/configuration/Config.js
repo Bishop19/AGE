@@ -20,6 +20,11 @@ import {
   TableRow,
   Paper,
   Button,
+  FormControl,
+  Select,
+  MenuItem,
+  Grid,
+  TextField,
 } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
@@ -217,9 +222,14 @@ const Deploy = ({ config }) => {
   );
 };
 
-const Test = ({ config, onDeploy }) => {
+const Test = ({ config, onDeploy, onConfigChange }) => {
   const [test, setTest] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [test_file, setTestFile] = useState(false);
+  const [can_start, setCanStart] = useState(false);
+  const [name, setName] = useState('');
+  const [file, setFile] = useState(null);
+  const [is_visible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const fetchRunningTest = async () => {
@@ -233,6 +243,50 @@ const Test = ({ config, onDeploy }) => {
     }
   }, []);
 
+  const handleTestFileChange = (test_file_id) => {
+    if (!test_file_id) setCanStart(false);
+    else setCanStart(true);
+
+    setTestFile(test_file_id);
+  };
+
+  const handleStartClick = async () => {
+    const valid = await testsService.createTest(config.id, test_file);
+
+    if (valid) {
+      setTest(true);
+    } else {
+      toast.error('Something went wrong.');
+    }
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsText(file, 'UTF-8');
+      reader.onload = function (event) {
+        setFile(event.target.result);
+      };
+      // TODO: validate file
+    }
+  };
+
+  const handleFileSubmit = async () => {
+    const test_file = await testsService.addTestFile(config.id, name, file);
+
+    if (test_file) {
+      config.test_files.push(test_file);
+      onConfigChange(config);
+      setName('');
+      setIsVisible(false);
+      toast.success('File uploaded.');
+    } else {
+      toast.error('Invalid file.');
+    }
+  };
+
   return (
     <>
       {config.cloud.is_deployed ? (
@@ -244,7 +298,65 @@ const Test = ({ config, onDeploy }) => {
             Percentagens
           </p>
         ) : (
-          <p>No tests running</p>
+          <Box>
+            <Typography>
+              Please, select your test file or upload a new one.
+            </Typography>
+            <Button onClick={() => setIsVisible(!is_visible)}>Add</Button>
+            {is_visible && (
+              <Box>
+                <Typography>Select file to upload</Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={2}>
+                    Name
+                  </Grid>
+                  <Grid item xs={10}>
+                    <TextField
+                      value={name}
+                      name="name"
+                      fullWidth
+                      variant="outlined"
+                      onChange={(event) => setName(event.target.value)}
+                    />
+                  </Grid>
+
+                  <Grid item xs={2}>
+                    Test file
+                  </Grid>
+                  <Grid item xs={10}>
+                    <TextField
+                      name="file"
+                      fullWidth
+                      type="file"
+                      variant="outlined"
+                      onChange={(event) => handleFileUpload(event)}
+                    />
+                  </Grid>
+                  <Button disabled={!file || !name} onClick={handleFileSubmit}>
+                    Add
+                  </Button>
+                </Grid>
+              </Box>
+            )}
+            <FormControl variant="outlined" style={{ width: '100%' }}>
+              <Select
+                value={test_file}
+                onChange={(event) => handleTestFileChange(event.target.value)}
+              >
+                <MenuItem selected="selected" value={false}>
+                  -
+                </MenuItem>
+                {config.test_files.map((file, index) => (
+                  <MenuItem key={index} value={file}>
+                    {file.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button disabled={!can_start} onClick={handleStartClick}>
+              Start
+            </Button>
+          </Box>
         )
       ) : (
         <>
@@ -361,20 +473,53 @@ const Benchmark = ({ results }) => {
     return { metric, ...values };
   }
 
-  const metrics = ['cpu', 'memory']; // TODO
-  const nr_gateways = gateways.length;
-  const rows = [];
+  function getMetricNamesFromTest(metrics) {
+    const metric_names = [];
+    const endpoint_metrics = Object.entries(metrics)[0][1];
 
+    Object.entries(endpoint_metrics).forEach(([name]) => {
+      metric_names.push(name);
+    });
+
+    return metric_names;
+  }
+
+  const nr_gateways = gateways.length;
+  const metrics = getMetricNamesFromTest(gateways_metrics[0]);
+  const rows_by_endpoint = {};
+
+  const metric_values = {};
   metrics.forEach((metric) => {
-    const values = {};
-    for (let i = 0; i < nr_gateways; i++) {
-      values[i] = gateways_metrics[i][metric];
-    }
-    rows.push(createData(metric, values));
+    gateways_metrics.forEach((gateway_metrics) => {
+      Object.entries(gateway_metrics).forEach(
+        ([endpoint, endpoint_metrics]) => {
+          if (metric_values[endpoint]) {
+            metric_values[endpoint].push(endpoint_metrics[metric]);
+          } else {
+            metric_values[endpoint] = [endpoint_metrics[metric]];
+          }
+        }
+      );
+    });
   });
 
-  return (
-    <>
+  Object.entries(metric_values).forEach(([endpoint, values]) => {
+    const a = [];
+    for (let i = 0; i < values.length; i += nr_gateways) {
+      const b = {};
+      for (let j = 0; j < nr_gateways; j++) {
+        b[j] = values[i + j];
+        b['metric'] = metrics[i / nr_gateways];
+      }
+      b['endpoint'] = endpoint;
+      a[i / nr_gateways] = b;
+    }
+    rows_by_endpoint[endpoint] = a;
+  });
+
+  return Object.entries(rows_by_endpoint).map(([endpoint, rows], index) => (
+    <Box key={index} mt={2} pb={2}>
+      <Typography>{endpoint}</Typography>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
@@ -397,24 +542,25 @@ const Benchmark = ({ results }) => {
               }
 
               return (
-                <TableRow key={row.metric}>
-                  <TableCell component="th" scope="row">
-                    {row.metric}
-                  </TableCell>
-                  {values}
-                </TableRow>
+                row.metric != 'Label' && (
+                  <TableRow key={row.metric}>
+                    <TableCell component="th" scope="row">
+                      {row.metric}
+                    </TableCell>
+                    {values}
+                  </TableRow>
+                )
               );
             })}
           </TableBody>
         </Table>
       </TableContainer>
-    </>
-  );
+    </Box>
+  ));
 };
 
 const Config = (props) => {
   const classes = useStyles();
-
   const [config, setConfig] = useState(false);
   useEffect(() => {
     const fetchConfig = async () => {
@@ -466,7 +612,11 @@ const Config = (props) => {
               <Deploy config={config} />
             </TabPanel>
             <TabPanel value={tab} index={2}>
-              <Test onDeploy={handleTabChange} config={config} />
+              <Test
+                onDeploy={handleTabChange}
+                config={config}
+                onConfigChange={setConfig}
+              />
             </TabPanel>
             <TabPanel value={tab} index={3}>
               <Results config_id={config.id} />
