@@ -9,7 +9,7 @@ from config import Config
 
 db = SQLAlchemy()
 jwt = JWTManager()
-migrate = Migrate()
+migrate = Migrate(compare_type=True)
 
 
 def create_app(config_class=Config):

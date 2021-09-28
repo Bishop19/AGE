@@ -26,7 +26,7 @@ class Provider(db.Model):
 
 
 class Instance(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     ip = db.Column(db.String(32), nullable=False)
     gateway = db.Column(db.String(32), nullable=False)
