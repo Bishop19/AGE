@@ -12,6 +12,7 @@ export default class RAMLParser implements Parser {
           query_params: {},
           path_params: {},
           body_params: {},
+          security: 'None',
         },
       ],
     };

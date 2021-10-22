@@ -5,6 +5,7 @@ export interface Endpoint {
   query_params: Record<string, Param>;
   path_params: Record<string, Param>;
   body_params: Record<string, Param>;
+  security: string;
 }
 
 export interface Config {

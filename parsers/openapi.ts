@@ -43,6 +43,7 @@ export default class OpenAPIParser implements Parser {
           base_path = this.formatBasePath((info as any).servers[0].url);  
         }
 
+        // Parse parameters (path & query)
         (info as OpenAPI.Operation).parameters?.forEach((parameter: any) => {
           const type = this.parseParameterType(parameter);
 
@@ -56,10 +57,18 @@ export default class OpenAPIParser implements Parser {
           }
         });
 
+        // Parse body
         const body = (info as any).requestBody;
         let body_params: Record<string, Param> = {};
         if (body) {
           body_params = this.parseRequestBody(body);
+        }
+
+        // Check Authorization
+        // TODO : too basic check
+        let security = 'NONE';
+        if ((info as OpenAPI.Operation).security) {
+          security = 'JWT';
         }
 
         endpoints.push({
@@ -69,11 +78,11 @@ export default class OpenAPIParser implements Parser {
           query_params,
           path_params,
           body_params,
+          security,
         });
       });
     });
 
-    console.log(endpoints);
     return endpoints;
   }
 

@@ -13,6 +13,7 @@ const upload = multer({ dest: './uploads/' });
 app.use(cors());
 
 app.post('/parser', upload.single('file'), async (req, res) => {
+  // TODO : how to handle error from middleware?
   const file = req.file;
   if (!file) {
     res.sendStatus(400);
