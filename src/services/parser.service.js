@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_PARSER_API_URL;
+const API_URL =
+  process.env.REACT_APP_PARSER_API_URL ||
+  'https://agp-doc-parser.herokuapp.com';
 
 const parse = (file) => {
   const form_data = new FormData();

@@ -1,7 +1,8 @@
 import axios from 'axios';
 import fileDownload from 'js-file-download';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL =
+  process.env.REACT_APP_API_URL || 'https://agp-config-manager.herokuapp.com';
 
 const instance = axios.create({
   baseURL: `${API_URL}`,
