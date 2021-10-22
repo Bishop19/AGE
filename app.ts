@@ -27,20 +27,22 @@ app.post('/parser', upload.single('file'), async (req, res) => {
       parser = new OpenAPIParser();
       response = parser.parse('./uploads/' + file.filename);
       break;
-    // case 'RAML':
-    //   parser = new RAMLParser();
-    //   response = parser.parse('./uploads/' + file.filename);
-    //   break;
-    // case 'APIBLUEPRINT':
-    //   parser = new APIBlueprintParser();
-    //   response = parser.parse('./uploads/' + file.filename);
-    //   break;
+    case 'RAML':
+      parser = new RAMLParser();
+      response = parser.parse('./uploads/' + file.filename);
+      break;
+    case 'APIBLUEPRINT':
+      parser = new APIBlueprintParser();
+      response = parser.parse('./uploads/' + file.filename);
+      break;
     default:
       res.status(500).send({ error: 'Documentation file not valid' });
   }
   res.send(await response);
 });
 
-app.listen(3000, () => {
-  console.log('The application is listening on port 3000!');
+app.listen(process.env.PORT || 3000, () => {
+  console.log(
+    `The application is listening on port ${process.env.PORT || 3000}!`
+  );
 });
