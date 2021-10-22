@@ -1,3 +1,4 @@
+from datetime import datetime
 import re
 import csv
 from random import randint
@@ -44,6 +45,11 @@ def create_test(config_id):
 
     data = request.get_json() or {}
 
+    name = data.get("name") or None
+
+    if not name:
+        return error_response(400, "No name provided")
+
     test_file = data.get("test_file") or None
 
     if not test_file:
@@ -56,7 +62,7 @@ def create_test(config_id):
 
     # Create test
     test = Test(
-        is_finished=False,
+        name=name,
         machine_type=machine_type,
         config_id=config_id,
         test_file_id=test_file["id"],
@@ -170,6 +176,7 @@ def test_results(config_id, test_id):
             return error_response(400, "Wrong result parameters provided")
 
     test.is_finished = True
+    test.finish_date = datetime.utcnow()
 
     db.session.add(test)
     db.session.commit()

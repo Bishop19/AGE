@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "timeout": "60s",
   "extra_config": {
     "github_com/devopsfaith/krakend-cors": {
       "allow_origins": ["*"],
@@ -12,6 +13,7 @@
   "endpoints": [{% for endpoint in endpoints %}
     {
       "endpoint": "{{ endpoint.endpoint_path }}",
+      "headers_to_pass": ["*"],
       "method": "{{ endpoint.method }}",
       "output_encoding": "no-op",
       {% if endpoint.query_params|length > 0 %}
