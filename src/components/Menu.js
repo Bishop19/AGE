@@ -1,6 +1,6 @@
-import React from "react";
-import PropTypes from "prop-types";
-import clsx from "clsx";
+import React from 'react';
+import PropTypes from 'prop-types';
+import clsx from 'clsx';
 import {
   Drawer,
   Divider,
@@ -9,16 +9,15 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { NavLink } from "react-router-dom";
+} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import { NavLink } from 'react-router-dom';
 
 /* ICONS */
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import BuildIcon from "@material-ui/icons/Build";
-import AssessmentIcon from "@material-ui/icons/Assessment";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import CloudIcon from "@material-ui/icons/Cloud";
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import BuildIcon from '@material-ui/icons/Build';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import CloudIcon from '@material-ui/icons/Cloud';
 
 const drawerWidth = 240;
 
@@ -26,35 +25,35 @@ const useStyles = makeStyles((theme) => ({
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
-    whiteSpace: "nowrap",
+    whiteSpace: 'nowrap',
   },
   drawerOpen: {
     width: drawerWidth,
-    transition: theme.transitions.create("width", {
+    transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
   },
   drawerClose: {
-    transition: theme.transitions.create("width", {
+    transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    overflowX: "hidden",
+    overflowX: 'hidden',
     width: theme.spacing(7),
   },
   toolbar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-end",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
     padding: theme.spacing(0, 1),
     // necessary for content to be below app bar
     ...theme.mixins.toolbar,
   },
   active: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: theme.palette.primary.main,
-    "& .icon": {
+    '& .icon': {
       color: theme.palette.primary.dark,
     },
   },
@@ -123,17 +122,6 @@ const Menu = ({ onClose, open }) => {
             <CloudIcon className="icon" />
           </ListItemIcon>
           <ListItemText primary="Clouds" />
-        </ListItem>
-        <ListItem
-          button
-          component={NavLink}
-          to="/results"
-          activeClassName={classes.active}
-        >
-          <ListItemIcon>
-            <AssessmentIcon className="icon" />
-          </ListItemIcon>
-          <ListItemText primary="Results" />
         </ListItem>
       </List>
     </Drawer>

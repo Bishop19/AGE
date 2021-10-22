@@ -102,10 +102,7 @@ const APIDoc = ({ config, onConfigChange }) => {
           <Box py={2}>
             <Typography variant="h5">Endpoints</Typography>
             <Typography variant="subtitle1" color="textSecondary">
-              Check if the endpoints are correct
-            </Typography>
-            <Typography variant="subtitle1" color="textSecondary" paragraph>
-              Domain: {config.domain}
+              Check if the endpoints are correct.
             </Typography>
 
             {config.endpoints.map((endpoint, index) => (
@@ -140,9 +137,21 @@ const APIGatewayCard = ({ gateway, onSelect }) => {
     },
   }))();
 
-  const handleLearnMoreClick = (event) => {
+  const handleLearnMoreClick = (event, gateway) => {
     event.stopPropagation();
-    window.open('https://www.google.com', '_blank');
+    let url;
+    switch (gateway.toUpperCase()) {
+      case 'KONG':
+        url = 'https://konghq.com/kong/';
+        break;
+      case 'KRAKEND':
+        url = 'https://www.krakend.io/';
+        break;
+      case 'TYK':
+        url = 'https://tyk.io/';
+        break;
+    }
+    window.open(url, '_blank');
   };
 
   return (
@@ -164,7 +173,9 @@ const APIGatewayCard = ({ gateway, onSelect }) => {
           fontWeight="fontWeightBold"
         >
           <Typography variant="h5">{gateway.name}</Typography>
-          <p onClick={handleLearnMoreClick}>Learn more</p>
+          <p onClick={(event) => handleLearnMoreClick(event, gateway.name)}>
+            Learn more
+          </p>
         </Box>
       </Box>
     </Card>

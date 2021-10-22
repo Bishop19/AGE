@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { toast } from 'react-toastify';
+import { Bar, Pie } from 'react-chartjs-2';
 
 /* Material UI */
 import {
@@ -25,12 +26,14 @@ import {
   MenuItem,
   Grid,
   TextField,
+  Switch,
 } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
 
 /* Components */
 import Endpoint from '../../components/Endpoint';
+import Status from '../../components/Status';
 
 /* Services */
 import configsService from '../../services/configs.service';
@@ -164,8 +167,13 @@ const InfoCard = ({ config_id, name, score, className, downloadable }) => {
 const Info = ({ config_id, gateways, cloud, endpoints }) => {
   return (
     <>
-      <Box>
+      <Box py={1}>
         <Typography variant="h5">Gateways</Typography>
+        <Typography variant="subtitle1" color="textSecondary">
+          Gateways that will be tested for this configuration. To download the
+          gateway's configuration, click on the respective gateway.
+        </Typography>
+
         <Box display="flex">
           {gateways.map((gateway, index) => (
             <Box p={2} key={index}>
@@ -174,16 +182,23 @@ const Info = ({ config_id, gateways, cloud, endpoints }) => {
           ))}
         </Box>
       </Box>
-      <Box>
+      <Box py={1}>
         <Typography variant="h5">Cloud</Typography>
+        <Typography variant="subtitle1" color="textSecondary">
+          Cloud in which the configuration will run.
+        </Typography>
+
         <Box display="flex">
           <Box p={2}>
             <InfoCard name={cloud.provider} />
           </Box>
         </Box>
       </Box>
-      <Box>
+      <Box py={1}>
         <Typography variant="h5">Endpoints</Typography>
+        <Typography variant="subtitle1" color="textSecondary">
+          List of the endpoints provided in the API documentation file.
+        </Typography>
 
         {endpoints.map((endpoint, index) => (
           <Endpoint key={index} endpoint={endpoint} />
@@ -201,10 +216,59 @@ const Deploy = ({ config }) => {
   };
 
   return config.cloud.is_deployed ? (
-    <>Deployed (TODO)</>
+    <>
+      <Box display="flex" alignItems="center" justifyContent="space-between">
+        <Typography variant="h5">Deployment</Typography>
+        <Status state="Deployed" />
+      </Box>
+
+      <Box py={2}>
+        <Typography variant="h6">Instances</Typography>
+        <Box py={2}>
+          <TableContainer component={Paper}>
+            <Table aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Gateway</TableCell>
+                  <TableCell>Cloud ID</TableCell>
+                  <TableCell>IP</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {config.instances.map((instance) => (
+                  <TableRow key={instance.gateway}>
+                    <TableCell component="th" scope="row">
+                      {instance.gateway}
+                    </TableCell>
+                    <TableCell>{instance.id}</TableCell>
+                    <TableCell>{instance.ip}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Box>
+
+      <Box
+        mt={4}
+        p={2}
+        style={{ borderRadius: '20px', border: '1px solid red' }}
+      >
+        <Box py={2}>
+          <Typography variant="h6">Danger Zone</Typography>
+
+          <Typography variant="paragraph">Be careful...</Typography>
+          <Button color="secondary">Delete</Button>
+        </Box>
+      </Box>
+    </>
   ) : (
     <>
-      <Typography variant="h5">Deploy</Typography>
+      <Box display="flex" alignItems="center" justifyContent="space-between">
+        <Typography variant="h5">Deployment</Typography>
+        <Status state="Not Deployed" />
+      </Box>
       <Typography variant="body1">
         Based on your configuration, the following machines will be deployed:
       </Typography>
@@ -228,6 +292,7 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
   const [test_file, setTestFile] = useState(false);
   const [can_start, setCanStart] = useState(false);
   const [name, setName] = useState('');
+  const [file_name, setFileName] = useState('');
   const [file, setFile] = useState(null);
   const [is_visible, setIsVisible] = useState(false);
   const [machine_type, setMachineType] = useState('n2-standard-2');
@@ -254,6 +319,7 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
   const handleStartClick = async () => {
     const valid = await testsService.createTest(
       config.id,
+      name,
       test_file,
       machine_type
     );
@@ -279,12 +345,16 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
   };
 
   const handleFileSubmit = async () => {
-    const test_file = await testsService.addTestFile(config.id, name, file);
+    const test_file = await testsService.addTestFile(
+      config.id,
+      file_name,
+      file
+    );
 
     if (test_file) {
       config.test_files.push(test_file);
       onConfigChange(config);
-      setName('');
+      setFileName('');
       setIsVisible(false);
       toast.success('File uploaded.');
     } else {
@@ -304,93 +374,136 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
           </p>
         ) : (
           <Box>
-            <Typography>
-              Please, select your test file or upload a new one.
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <Typography variant="h5">Testing</Typography>
+              <Button onClick={() => setIsVisible(!is_visible)}>
+                Upload File
+              </Button>
+            </Box>
+            <Typography variant="subtitle1" color="textSecondary">
+              Select the name, test file and the machine where the test will
+              run. If you don't have a test file upload a new one.
             </Typography>
-            <Button onClick={() => setIsVisible(!is_visible)}>Add</Button>
             {is_visible && (
-              <Box>
-                <Typography>Select file to upload</Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={2}>
-                    Name
-                  </Grid>
-                  <Grid item xs={10}>
-                    <TextField
-                      value={name}
-                      name="name"
-                      fullWidth
-                      variant="outlined"
-                      onChange={(event) => setName(event.target.value)}
-                    />
-                  </Grid>
+              <Box
+                p={2}
+                my={2}
+                style={{ borderRadius: '20px', border: '1px solid black' }}
+              >
+                <Typography variant="h6">Upload test file</Typography>
+                <Box pt={2}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={2}>
+                      Name
+                    </Grid>
+                    <Grid item xs={10}>
+                      <TextField
+                        value={name}
+                        name="name"
+                        fullWidth
+                        variant="outlined"
+                        onChange={(event) => setFileName(event.target.value)}
+                      />
+                    </Grid>
 
-                  <Grid item xs={2}>
-                    Test file
+                    <Grid item xs={2}>
+                      Test file
+                    </Grid>
+                    <Grid item xs={10}>
+                      <TextField
+                        name="file"
+                        fullWidth
+                        type="file"
+                        variant="outlined"
+                        onChange={(event) => handleFileUpload(event)}
+                      />
+                    </Grid>
+                    <Box display="flex" justifyContent="flex-end" width="100%">
+                      <Button
+                        disabled={!file || !name}
+                        onClick={handleFileSubmit}
+                      >
+                        Add
+                      </Button>
+                    </Box>
                   </Grid>
-                  <Grid item xs={10}>
-                    <TextField
-                      name="file"
-                      fullWidth
-                      type="file"
-                      variant="outlined"
-                      onChange={(event) => handleFileUpload(event)}
-                    />
-                  </Grid>
-                  <Button disabled={!file || !name} onClick={handleFileSubmit}>
-                    Add
-                  </Button>
-                </Grid>
+                </Box>
               </Box>
             )}
-            <Grid item xs={2}>
-              Test File
-            </Grid>
-            <Grid item xs={10}>
-              <FormControl variant="outlined" style={{ width: '100%' }}>
-                <Select
-                  value={test_file}
-                  onChange={(event) => handleTestFileChange(event.target.value)}
-                >
-                  <MenuItem selected="selected" value={false}>
-                    -
-                  </MenuItem>
-                  {config.test_files.map((file, index) => (
-                    <MenuItem key={index} value={file}>
-                      {file.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+            <Box pt={4}>
+              <Grid container spacing={2}>
+                <Grid item xs={2}>
+                  Name
+                </Grid>
+                <Grid item xs={10}>
+                  <TextField
+                    value={name}
+                    name="name"
+                    fullWidth
+                    variant="outlined"
+                    onChange={(event) => setName(event.target.value)}
+                  />
+                </Grid>
 
-            <Grid item xs={2}>
-              Machine Type
-            </Grid>
-            <Grid item xs={10}>
-              <FormControl variant="outlined" style={{ width: '100%' }}>
-                <Select
-                  value={machine_type}
-                  onChange={(event) => setMachineType(event.target.value)}
-                >
-                  <MenuItem selected="selected" value={'n2-standard-2'}>
-                    N2 Standard 2 (2 CPU, 8GB RAM)
-                  </MenuItem>
-                  <MenuItem value={'e2-standard-2'}>
-                    E2 Standard 2 (2 CPU, 8GB RAM)
-                  </MenuItem>
-                  {/* TODO: ADD MACHINE TYPES */}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Button disabled={!can_start} onClick={handleStartClick}>
-              Start
-            </Button>
+                <Grid item xs={2}>
+                  Test File
+                </Grid>
+                <Grid item xs={10}>
+                  <FormControl variant="outlined" style={{ width: '100%' }}>
+                    <Select
+                      value={test_file}
+                      onChange={(event) =>
+                        handleTestFileChange(event.target.value)
+                      }
+                    >
+                      <MenuItem selected="selected" value={false}>
+                        -
+                      </MenuItem>
+                      {config.test_files.map((file, index) => (
+                        <MenuItem key={index} value={file}>
+                          {file.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={2}>
+                  Machine Type
+                </Grid>
+                <Grid item xs={10}>
+                  <FormControl variant="outlined" style={{ width: '100%' }}>
+                    <Select
+                      value={machine_type}
+                      onChange={(event) => setMachineType(event.target.value)}
+                    >
+                      <MenuItem selected="selected" value={'n2-standard-2'}>
+                        N2 Standard 2 (2 CPU, 8GB RAM)
+                      </MenuItem>
+                      <MenuItem value={'e2-standard-2'}>
+                        E2 Standard 2 (2 CPU, 8GB RAM)
+                      </MenuItem>
+                      {/* TODO: ADD MACHINE TYPES */}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Box>
+
+            <Box display="flex" justifyContent="flex-end" width="100%">
+              <Button disabled={!can_start} onClick={handleStartClick}>
+                Start
+              </Button>
+            </Box>
           </Box>
         )
       ) : (
         <>
-          <Typography>Please, deploy your instances first</Typography>
+          <Typography>Deploy your instances first.</Typography>
           <Button onClick={() => onDeploy(null, 1)}>Deploy</Button>
         </>
       )}
@@ -421,32 +534,231 @@ const Results = ({ config_id }) => {
 const ResultList = ({ results, onResultSelect }) => {
   const columns = [
     { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'name', headerName: 'Name', width: 250 },
     {
       field: 'gateways',
       headerName: 'Gateways',
-      width: 130,
+      width: 300,
       valueGetter: (params) => {
         const results = params.row.results;
         return results.map((r) => r.gateway).join(', ');
       },
     },
-    { field: 'begin', headerName: 'Begin Date', width: 130 },
-    { field: 'end', headerName: 'End Date', width: 130 },
+    { field: 'start_date', headerName: 'Start Date', width: 250 },
+    { field: 'finish_date', headerName: 'Finish Date', width: 250 },
   ];
 
   return (
-    <Box height={400} width="100%">
-      <DataGrid
-        rows={results}
-        columns={columns}
-        pageSize={5}
-        onRowClick={({ row }) => onResultSelect(row)}
-      />
-    </Box>
+    <>
+      <Typography variant="h5">Results</Typography>
+
+      <Box height={400} width="100%" pt={2}>
+        <DataGrid
+          rows={results}
+          columns={columns}
+          pageSize={5}
+          onRowClick={({ row }) => onResultSelect(row)}
+        />
+      </Box>
+    </>
   );
 };
 
+const ResultsCharts = ({ results }) => {
+  const endpoints = Object.keys(results[0].metrics);
+  const charts = {};
+  const colors = [
+    'rgb(19, 63, 92)',
+    'rgb(235, 95, 94)',
+    'rgb(243, 165, 51)',
+    'rgb(0, 192, 0)', // success
+    'rgb(75, 0, 0)', // error
+  ];
+
+  const createDataEndpoint = (endpoint) => {
+    const data = [
+      {
+        title: 'Percentiles',
+        chart: 'Bar',
+        labels: ['Median', '90%', '95%', '99%'],
+        datasets: endpoints.map((_, index) => ({
+          label: results[index].gateway,
+          data: [
+            results[index].metrics[endpoint]['Median'],
+            results[index].metrics[endpoint]['90% Line'],
+            results[index].metrics[endpoint]['95% Line'],
+            results[index].metrics[endpoint]['99% Line'],
+          ],
+          backgroundColor: colors[index],
+        })),
+      },
+      {
+        title: 'Min, Average, Max, Std. Dev.',
+        chart: 'Bar',
+        labels: ['Min', 'Average', 'Max', 'Std. Dev.'],
+        datasets: endpoints.map((_, index) => ({
+          label: results[index].gateway,
+          data: [
+            results[index].metrics[endpoint]['Min'],
+            results[index].metrics[endpoint]['Average'],
+            results[index].metrics[endpoint]['Max'],
+            results[index].metrics[endpoint]['Std. Dev.'],
+          ],
+          backgroundColor: colors[index],
+        })),
+      },
+      {
+        title: 'Success/Error rate',
+        chart: 'Pie',
+        data: results.map((result, index) => ({
+          labels: ['Success', 'Error'],
+          label: result.gateway,
+          datasets: [
+            {
+              data: [
+                100 - parseFloat(result.metrics[endpoint]['Error %']),
+                parseFloat(result.metrics[endpoint]['Error %']),
+              ],
+              backgroundColor: [colors[3], colors[4]],
+            },
+          ],
+        })),
+      },
+      {
+        title: 'Throughput',
+        chart: 'HorizontalBar',
+        labels: results.map((result) => result.gateway),
+        datasets: [
+          {
+            // label: 'Throughput',
+            data: results.map(
+              (result) => result.metrics[endpoint]['Throughput']
+            ),
+            backgroundColor: [colors[0], colors[1], colors[2]],
+          },
+        ],
+      },
+    ];
+
+    return data;
+  };
+
+  endpoints.forEach((endpoint) => {
+    charts[endpoint] = createDataEndpoint(endpoint);
+  });
+
+  const options = {
+    scales: {
+      yAxes: [
+        {
+          ticks: {
+            beginAtZero: true,
+          },
+        },
+      ],
+    },
+  };
+
+  const optionsHorizontal = {
+    indexAxis: 'y',
+    // Elements options apply to all of the options unless overridden in a dataset
+    // In this case, we are setting the border of each horizontal bar to be 2px wide
+    elements: {
+      bar: {
+        borderWidth: 2,
+      },
+    },
+    responsive: true,
+  };
+
+  return Object.entries(charts).map(([endpoint, data], i) => (
+    <>
+      <Box py={1}>
+        <Typography>{endpoint}</Typography>
+      </Box>
+      <Box key={i} width="80%" margin="auto">
+        {data.map((type, j) => {
+          switch (type.chart) {
+            case 'Bar':
+              return (
+                <Box py={2}>
+                  <Bar
+                    key={i + endpoint + j}
+                    data={type}
+                    options={{
+                      ...options,
+                      plugins: {
+                        title: {
+                          display: true,
+                          text: type.title,
+                        },
+                      },
+                    }}
+                  />
+                </Box>
+              );
+            case 'Pie':
+              return (
+                <>
+                  <Box py={2}>
+                    <Box display="flex" justifyContent="center">
+                      <Typography
+                        variant="subtitle2"
+                        component="span"
+                        color="textSecondary"
+                      >
+                        {type.title}
+                      </Typography>
+                    </Box>
+                    <Box display="flex" justifyContent="space-between">
+                      {type.data.map((t, k) => (
+                        <Box key={i + endpoint + j + k} width="30%">
+                          <Pie data={t} />
+                          <Box display="flex" justifyContent="center" pt={1}>
+                            <Typography
+                              variant="subtitle2"
+                              component="span"
+                              color="textSecondary"
+                            >
+                              {t.label}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                </>
+              );
+            case 'HorizontalBar':
+              return (
+                <Box py={2}>
+                  <Bar
+                    key={i + endpoint + j}
+                    data={type}
+                    options={{
+                      ...optionsHorizontal,
+                      plugins: {
+                        legend: {
+                          display: false,
+                        },
+                        title: {
+                          display: true,
+                          text: 'Throughput (req/s)',
+                        },
+                      },
+                    }}
+                  />
+                </Box>
+              );
+          }
+        })}
+      </Box>
+    </>
+  ));
+};
+
 const Result = ({ result, onBack }) => {
+  const [chartView, setChartView] = useState(false);
   result.results.sort((g1, g2) => g2.score - g1.score);
 
   return (
@@ -462,8 +774,32 @@ const Result = ({ result, onBack }) => {
         <Scores result={result} />
       </Box>
       <Box>
-        <Typography variant="h6">Benchmark</Typography>
-        <Benchmark results={result.results} />
+        <Box display="flex" justifyContent="space-between">
+          <Box>
+            <Typography variant="h6">Benchmark</Typography>
+            <Typography variant="subtitle1" color="textSecondary">
+              Results are grouped by endpoint.
+            </Typography>
+          </Box>
+
+          <Box>
+            <Grid container alignItems="center" spacing={1}>
+              <Grid item>Table</Grid>
+              <Grid item>
+                <Switch
+                  checked={chartView}
+                  onChange={() => setChartView(!chartView)}
+                />
+              </Grid>
+              <Grid item>Chart</Grid>
+            </Grid>
+          </Box>
+        </Box>
+        {chartView ? (
+          <ResultsCharts results={result.results} />
+        ) : (
+          <Benchmark results={result.results} />
+        )}
       </Box>
     </>
   );
@@ -495,13 +831,6 @@ const Benchmark = ({ results }) => {
   const gateways = results.map((gateway) => gateway.gateway);
   const gateways_metrics = results.map((gateway) => gateway.metrics);
   const classes = useStyles();
-
-  function createData(metric, values) {
-    metric = metric.split('_').join(' ');
-    metric = metric.charAt(0).toUpperCase() + metric.slice(1);
-
-    return { metric, ...values };
-  }
 
   function getMetricNamesFromTest(metrics) {
     const metric_names = [];
@@ -549,7 +878,10 @@ const Benchmark = ({ results }) => {
 
   return Object.entries(rows_by_endpoint).map(([endpoint, rows], index) => (
     <Box key={index} mt={2} pb={2}>
-      <Typography>{endpoint}</Typography>
+      <Box pb={2}>
+        <Typography>{endpoint}</Typography>
+      </Box>
+
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>

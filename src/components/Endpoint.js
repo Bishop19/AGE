@@ -6,7 +6,15 @@ import { Box } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 const Endpoint = ({ endpoint }) => {
-  const { base_path, endpoint_path, method, path_params, query_params, body_params } = endpoint;
+  const {
+    base_path,
+    endpoint_path,
+    method,
+    path_params,
+    query_params,
+    body_params,
+    security,
+  } = endpoint;
 
   const getBackgroundColor = () => {
     switch (method.toUpperCase()) {
@@ -49,8 +57,8 @@ const Endpoint = ({ endpoint }) => {
         onClick={handleClick}
         style={{ cursor: 'pointer' }}
       >
-        <Box flexGrow="1">{base_path+endpoint_path}</Box>
-        {endpoint.security != 'NONE' && (
+        <Box flexGrow="1">{base_path + endpoint_path}</Box>
+        {security != 'NONE' && (
           <Box mx={1} display="flex" alignItems="center">
             <LockOutlinedIcon color="action" />
           </Box>
