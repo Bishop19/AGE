@@ -124,6 +124,7 @@ class LoadTest:
             {"key": "token", "value": self.token},
             {"key": "config_id", "value": self.config_id},
             {"key": "test_id", "value": self.test_id},
+            {"key": "backend_url", "value": os.getenv("BACKEND_URL")},
         ]
 
         for instance in self.instances:

@@ -47,6 +47,8 @@ if [ ! -z "$TEST_FILE_KONG" ]; then
     sudo ./jmeter.sh -n -t test_kong.jmx -l test_kong.jtl;
     sudo ./JMeterPluginsCMD.sh --generate-csv results_kong.csv --input-jtl test_kong.jtl --plugin-type AggregateReport;
     RESULTS_KONG=$(<results_kong.csv)
+    RESULTS_KONG=$(sed -z "s/Dev\. /Dev.||/g" <<< $RESULTS_KONG)
+    RESULTS_KONG=$(sed -r "s/([0-9]) /\1||/g" <<< $RESULTS_KONG)
 else
     echo "NO KONG CONFIG"
 fi
@@ -61,6 +63,8 @@ if [ ! -z "$TEST_FILE_KRAKEND" ]; then
     sudo ./jmeter.sh -n -t test_krakend.jmx -l test_krakend.jtl;
     sudo ./JMeterPluginsCMD.sh --generate-csv results_krakend.csv --input-jtl test_krakend.jtl --plugin-type AggregateReport;
     RESULTS_KRAKEND=$(<results_krakend.csv)
+    RESULTS_KRAKEND=$(sed -z "s/Dev\. /Dev.||/g" <<< $RESULTS_KRAKEND)
+    RESULTS_KRAKEND=$(sed -r "s/([0-9]) /\1||/g" <<< $RESULTS_KRAKEND)
 else
     echo "NO KRAKEND CONFIG"
 fi
@@ -75,12 +79,15 @@ if [ ! -z "$TEST_FILE_TYK" ]; then
     sudo ./jmeter.sh -n -t test_tyk.jmx -l test_tyk.jtl;
     sudo ./JMeterPluginsCMD.sh --generate-csv results_tyk.csv --input-jtl test_tyk.jtl --plugin-type AggregateReport;
     RESULTS_TYK=$(<results_tyk.csv)
+    RESULTS_TYK=$(sed -z "s/Dev\. /Dev.||/g" <<< $RESULTS_TYK)
+    RESULTS_TYK=$(sed -r "s/([0-9]) /\1||/g" <<< $RESULTS_TYK)
 else
     echo "NO TYK CONFIG"
 fi
 echo "ENDING TYK"
 
 # Post results to config
+BACKEND_URL=$(curl http://metadata/computeMetadata/v1/instance/attributes/backend_url -H "Metadata-Flavor: Google")
 TOKEN=$(curl http://metadata/computeMetadata/v1/instance/attributes/token -H "Metadata-Flavor: Google")
 CONFIG_ID=$(curl http://metadata/computeMetadata/v1/instance/attributes/config_id -H "Metadata-Flavor: Google")
 TEST_ID=$(curl http://metadata/computeMetadata/v1/instance/attributes/test_id -H "Metadata-Flavor: Google")
@@ -91,4 +98,4 @@ curl \
 -H "Authorization: Bearer $TOKEN" \
 -H "Content-Type: application/json" \
 -d "$(generate_post_data)" \
-"https://agp-config-manager.herokuapp.com/configurations/$CONFIG_ID/tests/$TEST_ID"
+"$BACKEND_URL/configurations/$CONFIG_ID/tests/$TEST_ID"
