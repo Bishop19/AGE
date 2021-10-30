@@ -302,15 +302,21 @@ const Confirmation = ({ config, gateways, clouds, onError }) => {
     } else {
       onError(true);
     }
-  });
+  }, []);
 
   return (
     <Box>
       <Box margin="20px 0">
         <Typography variant="h5">Confirmation</Typography>
-        <p>Endpoints: {config.endpoints?.length}</p>
-        <p>Gateways: {filtered_gateways.map((gateway) => gateway.name)}</p>
-        <p>Cloud: {filtered_cloud.name}</p>
+
+        <Typography variant="h6">Endpoints</Typography>
+        <p>{config.endpoints?.length}</p>
+
+        <Typography variant="h6">Gateways</Typography>
+        <p>{filtered_gateways.map((gateway) => gateway.name).join(' ')}</p>
+
+        <Typography variant="h6">Cloud</Typography>
+        <p>{filtered_cloud && filtered_cloud.name}</p>
       </Box>
     </Box>
   );

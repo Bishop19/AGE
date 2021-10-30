@@ -64,11 +64,6 @@ const CloudList = () => {
     fetchClouds();
   }, []);
 
-  // TODO - Remove this
-  const addDummyCloud = () => {
-    setClouds([{ id: 1, name: 'Teste' }]);
-  };
-
   return (
     <>
       <Box display="flex" justifyContent="space-between" alignContent="center">
@@ -79,9 +74,6 @@ const CloudList = () => {
           </Typography>
         </Box>
         <Box>
-          <Button color="secondary" variant="outlined" onClick={addDummyCloud}>
-            Add dummy cloud
-          </Button>
           <Button
             color="secondary"
             variant="contained"

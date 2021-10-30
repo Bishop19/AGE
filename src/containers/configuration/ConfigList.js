@@ -58,7 +58,12 @@ const ConfigCard = ({ config }) => {
           </Typography>
           <Status state={config.state} />
         </Box>
-        <Box display="flex" paddingLeft={2} paddingBottom={1}>
+        <Box
+          display="flex"
+          paddingLeft={2}
+          paddingBottom={1}
+          color="text.secondary"
+        >
           <Box display="flex" alignItems="center">
             <RoomIcon></RoomIcon>
             <Box pl={1}>{config.endpoints.length}</Box>
@@ -98,44 +103,6 @@ const ConfigList = () => {
     fetchConfigs();
   }, []);
 
-  // TODO - Remove this
-  const addDummyConfig = () => {
-    setConfigurations([
-      {
-        id: 1,
-        name: 'Teste',
-        state: 'Running',
-        clouds: [1],
-        gateways: ['krakend'],
-        endpoints: [{}],
-      },
-      {
-        id: 2,
-        name: 'teste 2',
-        state: 'Finished',
-        clouds: [1],
-        gateways: ['krakend'],
-        endpoints: [{}],
-      },
-      {
-        id: 3,
-        name: 'teste 3',
-        state: 'No results',
-        clouds: [1],
-        gateways: ['krakend'],
-        endpoints: [{}],
-      },
-      {
-        id: 4,
-        name: 'teste 4',
-        state: 'Error',
-        clouds: [1],
-        gateways: ['krakend'],
-        endpoints: [{}],
-      },
-    ]);
-  };
-
   return (
     <>
       <Box display="flex" justifyContent="space-between" alignContent="center">
@@ -146,9 +113,6 @@ const ConfigList = () => {
           </Typography>
         </Box>
         <Box>
-          <Button color="secondary" variant="outlined" onClick={addDummyConfig}>
-            Add dummy config
-          </Button>
           <Button
             color="secondary"
             variant="contained"

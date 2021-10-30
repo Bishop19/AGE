@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { toast } from 'react-toastify';
 import { Bar, Pie } from 'react-chartjs-2';
+import { parseGatewayName } from '../../util/util';
 
 /* Material UI */
 import {
@@ -26,7 +27,6 @@ import {
   MenuItem,
   Grid,
   TextField,
-  Switch,
 } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
@@ -43,6 +43,9 @@ import testsService from '../../services/tests.service';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import PollIcon from '@material-ui/icons/Poll';
+import TableChartIcon from '@material-ui/icons/TableChart';
 
 /* Logos */
 import krakend from '../../assets/images/krakend.png';
@@ -55,6 +58,10 @@ import azure from '../../assets/images/azure.png';
 const useStyles = makeStyles((theme) => ({
   danger: {
     color: theme.palette.error.main,
+  },
+  dangerBackground: {
+    color: 'white',
+    backgroundColor: theme.palette.error.main,
   },
   tabs: {
     backgroundColor: 'white',
@@ -82,7 +89,14 @@ const TabPanel = (props) => {
   );
 };
 
-const InfoCard = ({ config_id, name, score, className, downloadable }) => {
+const InfoCard = ({
+  config_id,
+  name,
+  score,
+  className,
+  downloadable,
+  cloud_name,
+}) => {
   const selectImage = (name) => {
     switch (name.toUpperCase()) {
       case 'GCP':
@@ -142,7 +156,18 @@ const InfoCard = ({ config_id, name, score, className, downloadable }) => {
           justifyContent="center"
           alignItems="center"
         >
-          <img src={image} alt="Logo" style={{ maxWidth: '100%' }} />
+          {cloud_name ? (
+            <Box display="flex">
+              <Box width="40%">
+                <img src={image} alt="Logo" style={{ maxWidth: '100%' }} />
+              </Box>
+              <Box width="60%" display="flex" alignItems="center">
+                <Typography variant="h6"> {cloud_name} </Typography>
+              </Box>
+            </Box>
+          ) : (
+            <img src={image} alt="Logo" style={{ maxWidth: '100%' }} />
+          )}
         </Box>
         {score && (
           <>
@@ -165,6 +190,7 @@ const InfoCard = ({ config_id, name, score, className, downloadable }) => {
 };
 
 const Info = ({ config_id, gateways, cloud, endpoints }) => {
+  console.log(cloud);
   return (
     <>
       <Box py={1}>
@@ -190,7 +216,7 @@ const Info = ({ config_id, gateways, cloud, endpoints }) => {
 
         <Box display="flex">
           <Box p={2}>
-            <InfoCard name={cloud.provider} />
+            <InfoCard name={cloud.provider} cloud_name={cloud.name} />
           </Box>
         </Box>
       </Box>
@@ -209,6 +235,8 @@ const Info = ({ config_id, gateways, cloud, endpoints }) => {
 };
 
 const Deploy = ({ config }) => {
+  const classes = useStyles();
+
   const deployGateways = async () => {
     const valid = await configsService.deployGateways(config.id);
 
@@ -238,7 +266,7 @@ const Deploy = ({ config }) => {
                 {config.instances.map((instance) => (
                   <TableRow key={instance.gateway}>
                     <TableCell component="th" scope="row">
-                      {instance.gateway}
+                      {parseGatewayName(instance.gateway)}
                     </TableCell>
                     <TableCell>{instance.id}</TableCell>
                     <TableCell>{instance.ip}</TableCell>
@@ -255,11 +283,23 @@ const Deploy = ({ config }) => {
         p={2}
         style={{ borderRadius: '20px', border: '1px solid red' }}
       >
-        <Box py={2}>
-          <Typography variant="h6">Danger Zone</Typography>
-
-          <Typography variant="paragraph">Be careful...</Typography>
-          <Button color="secondary">Delete</Button>
+        <Box py={1}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography variant="h6">Danger Zone</Typography>
+              <Typography paragraph color="textSecondary">
+                Once you delete this configuration, there is no going back.
+                Please be certain.
+              </Typography>
+            </Box>
+            <Button className={classes.dangerBackground} variant="contained">
+              Delete
+            </Button>
+          </Box>
         </Box>
       </Box>
     </>
@@ -380,7 +420,11 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
               justifyContent="space-between"
             >
               <Typography variant="h5">Testing</Typography>
-              <Button onClick={() => setIsVisible(!is_visible)}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => setIsVisible(!is_visible)}
+              >
                 Upload File
               </Button>
             </Box>
@@ -402,7 +446,7 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
                     </Grid>
                     <Grid item xs={10}>
                       <TextField
-                        value={name}
+                        value={file_name}
                         name="name"
                         fullWidth
                         variant="outlined"
@@ -424,10 +468,13 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
                     </Grid>
                     <Box display="flex" justifyContent="flex-end" width="100%">
                       <Button
-                        disabled={!file || !name}
+                        variant="contained"
+                        color="primary"
+                        disabled={!file || !file_name}
                         onClick={handleFileSubmit}
                       >
-                        Add
+                        <CloudUploadIcon />
+                        <span>&nbsp;&nbsp;Add</span>
                       </Button>
                     </Box>
                   </Grid>
@@ -541,7 +588,7 @@ const ResultList = ({ results, onResultSelect }) => {
       width: 300,
       valueGetter: (params) => {
         const results = params.row.results;
-        return results.map((r) => r.gateway).join(', ');
+        return results.map((r) => parseGatewayName(r.gateway)).join(', ');
       },
     },
     { field: 'start_date', headerName: 'Start Date', width: 250 },
@@ -568,11 +615,11 @@ const ResultsCharts = ({ results }) => {
   const endpoints = Object.keys(results[0].metrics);
   const charts = {};
   const colors = [
-    'rgb(19, 63, 92)',
-    'rgb(235, 95, 94)',
-    'rgb(243, 165, 51)',
-    'rgb(0, 192, 0)', // success
-    'rgb(75, 0, 0)', // error
+    'rgb(116, 196, 118)',
+    'rgb(65, 182, 196)',
+    'rgb(34, 94, 168)',
+    'rgb(0, 150, 0)', // success
+    'rgb(150, 0, 0)', // error
   ];
 
   const createDataEndpoint = (endpoint) => {
@@ -582,7 +629,7 @@ const ResultsCharts = ({ results }) => {
         chart: 'Bar',
         labels: ['Median', '90%', '95%', '99%'],
         datasets: endpoints.map((_, index) => ({
-          label: results[index].gateway,
+          label: parseGatewayName(results[index].gateway),
           data: [
             results[index].metrics[endpoint]['Median'],
             results[index].metrics[endpoint]['90% Line'],
@@ -597,7 +644,7 @@ const ResultsCharts = ({ results }) => {
         chart: 'Bar',
         labels: ['Min', 'Average', 'Max', 'Std. Dev.'],
         datasets: endpoints.map((_, index) => ({
-          label: results[index].gateway,
+          label: parseGatewayName(results[index].gateway),
           data: [
             results[index].metrics[endpoint]['Min'],
             results[index].metrics[endpoint]['Average'],
@@ -612,7 +659,7 @@ const ResultsCharts = ({ results }) => {
         chart: 'Pie',
         data: results.map((result, index) => ({
           labels: ['Success', 'Error'],
-          label: result.gateway,
+          label: parseGatewayName(result.gateway),
           datasets: [
             {
               data: [
@@ -627,7 +674,7 @@ const ResultsCharts = ({ results }) => {
       {
         title: 'Throughput',
         chart: 'HorizontalBar',
-        labels: results.map((result) => result.gateway),
+        labels: results.map((result) => parseGatewayName(result.gateway)),
         datasets: [
           {
             // label: 'Throughput',
@@ -649,13 +696,14 @@ const ResultsCharts = ({ results }) => {
 
   const options = {
     scales: {
-      yAxes: [
-        {
-          ticks: {
-            beginAtZero: true,
+      y: {
+        ticks: {
+          beginAtZero: true,
+          callback: function (value) {
+            return value + ' ms';
           },
         },
-      ],
+      },
     },
   };
 
@@ -767,7 +815,15 @@ const Result = ({ result, onBack }) => {
         <IconButton onClick={onBack}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5">Test #{result.id}</Typography>
+        <Typography variant="h5">{result.name}</Typography>
+
+        <Typography
+          variant="h6"
+          color="textSecondary"
+          style={{ fontSize: '0.95em' }}
+        >
+          &nbsp;&nbsp;(Test #{result.id})
+        </Typography>
       </Box>
       <Box>
         <Typography variant="h6">Scores</Typography>
@@ -784,14 +840,22 @@ const Result = ({ result, onBack }) => {
 
           <Box>
             <Grid container alignItems="center" spacing={1}>
-              <Grid item>Table</Grid>
+              <Grid item>View:</Grid>
               <Grid item>
-                <Switch
-                  checked={chartView}
-                  onChange={() => setChartView(!chartView)}
-                />
+                <IconButton
+                  color={!chartView ? 'primary' : 'default'}
+                  onClick={() => setChartView(false)}
+                >
+                  <TableChartIcon />
+                </IconButton>
+
+                <IconButton
+                  color={chartView ? 'primary' : 'default'}
+                  onClick={() => setChartView(true)}
+                >
+                  <PollIcon />
+                </IconButton>
               </Grid>
-              <Grid item>Chart</Grid>
             </Grid>
           </Box>
         </Box>
@@ -888,7 +952,7 @@ const Benchmark = ({ results }) => {
             <TableRow>
               <TableCell>Metric</TableCell>
               {gateways.map((gateway, index) => (
-                <TableCell key={index}>{gateway}</TableCell>
+                <TableCell key={index}>{parseGatewayName(gateway)}</TableCell>
               ))}
             </TableRow>
           </TableHead>
@@ -941,14 +1005,19 @@ const Config = (props) => {
   return (
     <>
       <Box display="flex" justifyContent="space-between">
-        <Typography variant="h3">Config #{config.id}</Typography>
+        <Box display="flex" alignItems="center">
+          <Typography variant="h3">{config.name}</Typography>
+          <Typography variant="h6" color="textSecondary">
+            &nbsp;&nbsp;&nbsp;(Config #{config.id})
+          </Typography>
+        </Box>
         <Box>
           <IconButton aria-label="edit">
             <EditIcon />
           </IconButton>
-          <IconButton aria-label="delete" className={classes.danger}>
+          {/* <IconButton aria-label="delete" className={classes.danger}>
             <DeleteIcon />
-          </IconButton>
+          </IconButton> */}
         </Box>
       </Box>
       <Box marginTop={3}>

@@ -2,8 +2,41 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 /* Material UI */
-import { Box } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+
+const Params = ({ name, params }) => {
+  return (
+    <Box>
+      <Box>
+        <Typography
+          variant="subtitle1"
+          component="div"
+          style={{
+            display: 'inline-block',
+            padding: '0px 10px',
+            borderRadius: 10,
+            color: 'white',
+            background: 'gray',
+          }}
+        >
+          {name}
+        </Typography>
+      </Box>
+      {Object.keys(params).length ? (
+        <ul>
+          {Object.entries(params).map(([param, type], index) => (
+            <li key={index}>
+              {param} - {type}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No {name} parameters</p>
+      )}
+    </Box>
+  );
+};
 
 const Endpoint = ({ endpoint }) => {
   const {
@@ -77,9 +110,10 @@ const Endpoint = ({ endpoint }) => {
       {is_expanded && (
         <Box>
           <hr></hr>
-          <Box>Query: {JSON.stringify(query_params)}</Box>
-          <Box>Path: {JSON.stringify(path_params)}</Box>
-          <Box>Body: {JSON.stringify(body_params)}</Box>
+          <Typography variant="h6">Parameters</Typography>
+          <Params name="Path" params={path_params} />
+          <Params name="Body" params={body_params} />
+          <Params name="Query" params={query_params} />
         </Box>
       )}
     </Box>
