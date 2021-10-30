@@ -2,6 +2,7 @@ import re
 import zipfile
 import io
 import time
+import copy
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from app.models.config import Config
 
@@ -26,14 +27,13 @@ def transform_endpoints(config):
     endpoints = []
 
     for endpoint in config.endpoints:
-        endpoint.uri = re.sub(
-            r"\{(.*?)\}", r'$(uri_captures["\1"])', endpoint.endpoint_path
-        )
-        endpoint.endpoint_path = re.sub(
-            r"\{(.*?)\}", r"(?<\1>" + "[^/]+)", endpoint.endpoint_path
+        endp = copy.deepcopy(endpoint)
+        endp.uri = re.sub(r"\{(.*?)\}", r'$(uri_captures["\1"])', endp.endpoint_path)
+        endp.endpoint_path = re.sub(
+            r"\{(.*?)\}", r"(?<\1>" + "[^/]+)", endp.endpoint_path
         )
 
-        endpoints.append(endpoint)
+        endpoints.append(endp)
 
     return endpoints
 
