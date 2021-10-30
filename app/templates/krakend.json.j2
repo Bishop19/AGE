@@ -8,12 +8,14 @@
       "allow_methods": ["GET", "HEAD", "POST", "PUT", "DELETE"]
     }
   },
-  "output_encoding": "json",
   "name": "{{ name }}",
   "endpoints": [{% for endpoint in endpoints %}
     {
       "endpoint": "{{ endpoint.endpoint_path }}",
-      "headers_to_pass": ["*"],
+      "headers_to_pass": [
+        "Content-Type" {% if endpoint.security == "JWT" %}
+        , "Authorization"
+      {% endif %}],
       "method": "{{ endpoint.method }}",
       "output_encoding": "no-op",
       {% if endpoint.query_params|length > 0 %}
@@ -31,12 +33,6 @@
           "host": ["{{ endpoint.base_path }}"]
         }
       ]
-      {% if endpoint.security == "JWT" %}
-      ,
-      "headers_to_pass": [
-        "Authorization"
-      ]
-      {% endif %}
     }{% if not loop.last %},{% endif %}
   {%- endfor %}
   ]
