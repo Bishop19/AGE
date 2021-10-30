@@ -27,6 +27,15 @@ class Test(db.Model):
             "finish_date": self.finish_date,
         }
 
+    def to_dict_short(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "is_finished": self.is_finished,
+            "start_date": self.start_date,
+            "finish_date": self.finish_date,
+        }
+
     def __init__(self, name, machine_type, config_id, test_file_id):
         self.name = name
         self.machine_type = machine_type

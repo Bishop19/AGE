@@ -1,6 +1,7 @@
 from datetime import datetime
 import re
 import csv
+import math
 from random import randint
 from flask import json, jsonify, request
 from flask_jwt_extended.utils import create_access_token, get_jwt_identity
@@ -137,6 +138,58 @@ def get_results_from_data(data):
     return results
 
 
+def calculate_score(scores, total):
+    return math.ceil(sum(scores) * 100 / total)
+
+
+def calculate_scores(results):
+    metrics = [
+        "90% Line",
+        "95% Line",
+        "99% Line",
+        "Average",
+        "Min",
+        "Max",
+        "Median",
+        "Std. Dev.",
+        "Throughput",
+    ]
+    scores = {}
+    for gateway in results:
+        scores[gateway] = []
+
+    for metric in metrics:
+        values = []
+        metric_scores = []
+        for gateway, result in results.items():
+            values.append((float(result["TOTAL"][metric]), gateway))
+
+        if metric == "Throughput":
+            maximum = max(values, key=lambda item: item[0])
+            maximum = (float(maximum[0]), maximum[1])
+
+            for value in values:
+                score = 1 - (math.fabs(maximum[0] - value[0]) / maximum[0])
+                metric_scores.append((value[1], score))
+
+        else:
+            minimum = min(values, key=lambda item: item[0])
+            minimum = (float(minimum[0]), minimum[1])
+
+            for value in values:
+                if minimum[0] == 0:
+                    score = 0
+                else:
+                    score = 1 - (math.fabs(minimum[0] - value[0]) / value[0])
+
+                metric_scores.append((value[1], score))
+
+        for (gateway, score) in metric_scores:
+            scores[gateway].append(score)
+
+    return {k: calculate_score(v, len(metrics)) for k, v in scores.items()}
+
+
 @bp.route("/configurations/<int:config_id>/tests/<int:test_id>", methods=["PUT"])
 @validate_user()
 @check_config_ownership()
@@ -163,11 +216,13 @@ def test_results(config_id, test_id):
     if not results or len(results) == 0:
         return error_response(400, "No results provided")
 
+    scores = calculate_scores(results)
+
     for gateway in results:
         try:
             res = Result(
                 gateway=gateway,
-                score=randint(0, 100),  # TODO
+                score=scores[gateway],
                 metrics=results[gateway],
             )
             test.results.append(res)

@@ -26,11 +26,13 @@ def create_app(config_class=Config):
     from app.controllers.configs import bp as configs_bp
     from app.controllers.tests import bp as tests_bp
     from app.controllers.templates import bp as templates_bp
+    from app.controllers.dashboard import bp as dashboard_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(clouds_bp)
     app.register_blueprint(configs_bp)
     app.register_blueprint(tests_bp)
     app.register_blueprint(templates_bp)
+    app.register_blueprint(dashboard_bp)
 
     return app
