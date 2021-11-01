@@ -63,6 +63,7 @@ class Config(db.Model):
                 "name": self.cloud.cloud.name,
                 "provider": self.cloud.cloud.provider.name.value,
                 "is_deployed": self.cloud.is_deployed,
+                "machine_type": self.cloud.cloud.machine_type,
             },
             "gateways": self.gateways,
             "endpoints": [endpoint.to_dict() for endpoint in self.endpoints.all()],

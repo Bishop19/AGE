@@ -34,6 +34,7 @@ class Test(db.Model):
             "is_finished": self.is_finished,
             "start_date": self.start_date,
             "finish_date": self.finish_date,
+            "config_id": self.config_id,
         }
 
     def __init__(self, name, machine_type, config_id, test_file_id):
