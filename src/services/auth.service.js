@@ -44,7 +44,7 @@ const logout = () => {
 
 const getCurrentUser = async () => {
   const token = localStorage.getItem('token');
-  return token;
+  return token || false;
 };
 
 export default {

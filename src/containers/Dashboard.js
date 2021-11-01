@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { Link as RouterLink } from 'react-router-dom';
 import { parseGatewayName } from '../util/util';
 
 /* Services */
@@ -8,6 +10,7 @@ import dashboardService from '../services/dashboard.service';
 import {
   Box,
   Grid,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -26,9 +29,10 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import PlayCircleFilledWhiteIcon from '@material-ui/icons/PlayCircleFilledWhite';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
 const InfoCard = ({ title, info, color, icon }) => {
-  const useStyles = makeStyles((theme) => ({
+  const useStyles = makeStyles(() => ({
     root: {
       display: 'flex',
     },
@@ -138,7 +142,14 @@ const Results = ({ results }) => {
                 <TableCell>{result.name}</TableCell>
                 <TableCell>{result.config}</TableCell>
                 <TableCell>{parseGatewayName(result.gateway)}</TableCell>
-                <TableCell>TODO</TableCell>
+                <TableCell>
+                  <IconButton
+                    to={`/configs/${result.config_id}`}
+                    component={RouterLink}
+                  >
+                    <NavigateNextIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -177,7 +188,14 @@ const Tests = ({ tests }) => {
                     .join(', ')}
                 </TableCell>
                 <TableCell>{test.start_date}</TableCell>
-                <TableCell>TODO</TableCell>
+                <TableCell>
+                  <IconButton
+                    to={`/configs/${test.config_id}`}
+                    component={RouterLink}
+                  >
+                    <NavigateNextIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -191,7 +209,7 @@ const Dashboard = () => {
   const [nr_configs, setNumberConfigs] = useState(0);
   const [nr_tests, setNumberTests] = useState(0);
   const [running_tests, setRunningTests] = useState([]);
-  const [first_name, setFirstName] = useState('Joe Doe');
+  const [first_name, setFirstName] = useState('');
   const [results, setResults] = useState([]);
   const [deployed_configs, setDeployedConfigs] = useState(0);
 
@@ -205,6 +223,7 @@ const Dashboard = () => {
         setRunningTests(info.running_tests);
         setResults(info.latest_results);
         setDeployedConfigs(info.deployed_configs);
+        setFirstName('Joe Doe');
       }
     };
 
@@ -249,3 +268,25 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+InfoCard.propTypes = {
+  title: PropTypes.string,
+  info: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  color: PropTypes.string,
+  icon: PropTypes.element,
+};
+
+Tests.propTypes = {
+  tests: PropTypes.array,
+};
+
+Cards.propTypes = {
+  configs: PropTypes.number,
+  tests: PropTypes.number,
+  running_tests: PropTypes.number,
+  deployed_configs: PropTypes.number,
+};
+
+Results.propTypes = {
+  results: PropTypes.array,
+};

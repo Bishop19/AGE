@@ -127,3 +127,8 @@ export default Endpoint;
 Endpoint.propTypes = {
   endpoint: PropTypes.object.isRequired,
 };
+
+Params.propTypes = {
+  name: PropTypes.string.isRequired,
+  params: PropTypes.object.isRequired,
+};

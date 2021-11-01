@@ -15,7 +15,7 @@ import AddIcon from '@material-ui/icons/Add';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import RoomIcon from '@material-ui/icons/Room';
 import InputIcon from '@material-ui/icons/Input';
-import CloudIcon from '@material-ui/icons/Cloud';
+// import CloudIcon from '@material-ui/icons/Cloud';
 
 const NoConfigs = () => {
   return (

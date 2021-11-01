@@ -8,7 +8,7 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRouter';
 
 /* Containers */
-import Landing from './containers/Landing';
+// import Landing from './containers/Landing';
 import Login from './containers/authentication/Login';
 import Signup from './containers/authentication/Signup';
 import Dashboard from './containers/Dashboard';
@@ -49,7 +49,11 @@ const App = () => {
           <Layout auth={auth} onLogout={handlerLogout}>
             <Switch>
               <Route exact path="/">
-                {auth ? <Redirect to="/dashboard" /> : <Landing />}
+                {auth ? (
+                  <Redirect to="/dashboard" />
+                ) : (
+                  <Login onLogin={handlerLogin} />
+                )}
               </Route>
               <Route path="/login">
                 {auth ? (

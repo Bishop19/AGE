@@ -1,23 +1,32 @@
-import React from "react";
-import PropTypes from "prop-types";
-import clsx from "clsx";
-import { AppBar, Toolbar, Button, Grid, IconButton } from "@material-ui/core";
-import { Link as RouterLink, useHistory } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
+import React from 'react';
+import PropTypes from 'prop-types';
+import clsx from 'clsx';
+import {
+  AppBar,
+  Toolbar,
+  Button,
+  Grid,
+  IconButton,
+  Menu,
+  MenuItem,
+} from '@material-ui/core';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
 
 /* ICONS */
-import MenuIcon from "@material-ui/icons/Menu";
+import MenuIcon from '@material-ui/icons/Menu';
+import PersonIcon from '@material-ui/icons/Person';
 
 /* Toaster */
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(["width", "margin"], {
+    transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
@@ -25,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
   appBarShift: {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
+    transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
@@ -34,14 +43,54 @@ const useStyles = makeStyles((theme) => ({
     marginRight: 36,
   },
   hide: {
-    display: "none",
+    display: 'none',
   },
 }));
+
+const SimpleMenu = ({ handleLogout }) => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <div>
+      <IconButton
+        aria-controls="simple-menu"
+        aria-haspopup="true"
+        onClick={handleClick}
+      >
+        <PersonIcon color="action" />
+      </IconButton>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={handleClose}>My account</MenuItem>
+        <hr></hr>
+        <MenuItem onClick={handleLogout}>Logout</MenuItem>
+      </Menu>
+    </div>
+  );
+};
 
 const Header = ({ auth, onLogout, onOpen, open }) => {
   const classes = useStyles();
 
   const history = useHistory();
+
+  const handleLogout = () => {
+    history.push('/');
+    onLogout();
+  };
 
   const account_btns = (
     <>
@@ -66,11 +115,6 @@ const Header = ({ auth, onLogout, onOpen, open }) => {
     </>
   );
 
-  const handleLogout = () => {
-    history.push("/");
-    onLogout();
-  };
-
   return (
     <>
       <AppBar
@@ -80,7 +124,7 @@ const Header = ({ auth, onLogout, onOpen, open }) => {
         })}
       >
         <Toolbar>
-          {auth ? (
+          {auth && (
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -92,15 +136,12 @@ const Header = ({ auth, onLogout, onOpen, open }) => {
             >
               <MenuIcon />
             </IconButton>
-          ) : (
-            <Button component={RouterLink} to="/">
-              NAVBAR
-            </Button>
           )}
           <Grid container justify="flex-end">
             {auth ? (
-              <Button onClick={handleLogout}>Logout</Button>
+              <SimpleMenu handleLogout={handleLogout} />
             ) : (
+              // <Button onClick={handleLogout}>Logout</Button>
               account_btns
             )}
           </Grid>
@@ -131,4 +172,8 @@ Header.propTypes = {
   onLogout: PropTypes.func.isRequired,
   onOpen: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
+};
+
+SimpleMenu.propTypes = {
+  handleLogout: PropTypes.func.isRequired,
 };

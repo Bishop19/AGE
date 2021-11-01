@@ -40,12 +40,13 @@ import configsService from '../../services/configs.service';
 import testsService from '../../services/tests.service';
 
 /* Icons */
-import DeleteIcon from '@material-ui/icons/Delete';
+// import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import PollIcon from '@material-ui/icons/Poll';
 import TableChartIcon from '@material-ui/icons/TableChart';
+import { Icon } from '@iconify/react';
 
 /* Logos */
 import krakend from '../../assets/images/krakend.png';
@@ -190,7 +191,6 @@ const InfoCard = ({
 };
 
 const Info = ({ config_id, gateways, cloud, endpoints }) => {
-  console.log(cloud);
   return (
     <>
       <Box py={1}>
@@ -241,6 +241,54 @@ const Deploy = ({ config }) => {
     const valid = await configsService.deployGateways(config.id);
 
     // Todo: Rabbit?
+    console.log(valid);
+  };
+
+  const getMachineConfigs = (machine) => {
+    let cpu = 2;
+    let ram = 8;
+
+    switch (machine) {
+      case 'n2-standard-2':
+        cpu = 2;
+        ram = 8;
+    }
+
+    return (
+      <Box
+        display="inline-block"
+        borderRadius="20px"
+        style={{
+          boxShadow:
+            '0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)',
+        }}
+      >
+        <Box display="flex">
+          <Box
+            p={2}
+            display="flex"
+            borderRight="1px solid rgba(0,0,0,0.14)"
+            alignItems="center"
+          >
+            <Icon color="gray" icon="gg:server" height={32} />
+            <Box pl={2}>{machine}</Box>
+          </Box>
+          <Box
+            p={2}
+            borderRight="1px solid rgba(0,0,0,0.14)"
+            display="flex"
+            alignItems="center"
+          >
+            <Icon color="gray" icon="bi:cpu" height={32} />
+            <Box pl={2}>{cpu} CPUs</Box>
+          </Box>
+          <Box p={2} display="flex" alignItems="center">
+            <Icon color="gray" icon="fa-solid:memory" height={32} />
+            <Box pl={2}>{ram} GB</Box>
+          </Box>
+        </Box>
+      </Box>
+    );
   };
 
   return config.cloud.is_deployed ? (
@@ -309,19 +357,36 @@ const Deploy = ({ config }) => {
         <Typography variant="h5">Deployment</Typography>
         <Status state="Not Deployed" />
       </Box>
-      <Typography variant="body1">
-        Based on your configuration, the following machines will be deployed:
-      </Typography>
-      {config.gateways.map((gateway, index) => (
-        <li key={index}>{gateway}</li>
-      ))}
-      <Typography variant="body1">
-        Each will have one gateway running, which will be used to load test your
-        application.
-      </Typography>
-      <Button variant="contained" onClick={deployGateways}>
-        Deploy
-      </Button>
+
+      <Box py={2}>
+        <Typography variant="h6">Machine specification</Typography>
+        <Typography variant="body1">
+          Based on your configuration, {config.gateways.length} machines will be
+          deployed. Each will have one gateway running, which will be used to
+          load test your application.
+        </Typography>
+        <Box p={2}>{getMachineConfigs(config.cloud.machine_type)}</Box>
+      </Box>
+
+      {/* <Box py={1}>
+        <Typography variant="h6">Gateways</Typography>
+        <Typography variant="body1">
+          {config.gateways
+            .map((gateway) => parseGatewayName(gateway))
+            .join(', ')}
+        </Typography>
+      </Box> */}
+
+      <Box display="flex" justifyContent="flex-end">
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={deployGateways}
+          style={{ marginRight: 0 }}
+        >
+          Deploy
+        </Button>
+      </Box>
     </>
   );
 };
@@ -408,10 +473,27 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
         loading ? (
           <p>Loading</p>
         ) : test ? (
-          <p>
-            Your test is running. Please, wait until it finishes. Rabbit?
-            Percentagens
-          </p>
+          <Box
+            mt={4}
+            p={2}
+            style={{ borderRadius: '20px', border: '1px solid gray' }}
+          >
+            <Box py={1}>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Box>
+                  <Typography variant="h6">Test running</Typography>
+                  <Typography paragraph color="textSecondary">
+                    A test is already running. Please wait for the results to be
+                    able to make a new test.
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
         ) : (
           <Box>
             <Box
@@ -550,8 +632,34 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
         )
       ) : (
         <>
-          <Typography>Deploy your instances first.</Typography>
-          <Button onClick={() => onDeploy(null, 1)}>Deploy</Button>
+          <Box
+            mt={4}
+            p={2}
+            style={{ borderRadius: '20px', border: '1px solid red' }}
+          >
+            <Box py={1}>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Box>
+                  <Typography variant="h6">Instances not deployed</Typography>
+                  <Typography paragraph color="textSecondary">
+                    Deploy your instances first in order to test this
+                    configuration.
+                  </Typography>
+                </Box>
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  onClick={() => onDeploy(null, 1)}
+                >
+                  Deploy
+                </Button>
+              </Box>
+            </Box>
+          </Box>
         </>
       )}
     </>
@@ -623,6 +731,7 @@ const ResultsCharts = ({ results }) => {
   ];
 
   const createDataEndpoint = (endpoint) => {
+    console.log(results);
     const data = [
       {
         title: 'Percentiles',
@@ -657,7 +766,7 @@ const ResultsCharts = ({ results }) => {
       {
         title: 'Success/Error rate',
         chart: 'Pie',
-        data: results.map((result, index) => ({
+        data: results.map((result) => ({
           labels: ['Success', 'Error'],
           label: parseGatewayName(result.gateway),
           datasets: [
@@ -720,18 +829,17 @@ const ResultsCharts = ({ results }) => {
   };
 
   return Object.entries(charts).map(([endpoint, data], i) => (
-    <>
+    <Box key={i}>
       <Box py={1}>
         <Typography>{endpoint}</Typography>
       </Box>
-      <Box key={i} width="80%" margin="auto">
+      <Box width="80%" margin="auto">
         {data.map((type, j) => {
           switch (type.chart) {
             case 'Bar':
               return (
-                <Box py={2}>
+                <Box py={2} key={i + endpoint + j}>
                   <Bar
-                    key={i + endpoint + j}
                     data={type}
                     options={{
                       ...options,
@@ -747,41 +855,38 @@ const ResultsCharts = ({ results }) => {
               );
             case 'Pie':
               return (
-                <>
-                  <Box py={2}>
-                    <Box display="flex" justifyContent="center">
-                      <Typography
-                        variant="subtitle2"
-                        component="span"
-                        color="textSecondary"
-                      >
-                        {type.title}
-                      </Typography>
-                    </Box>
-                    <Box display="flex" justifyContent="space-between">
-                      {type.data.map((t, k) => (
-                        <Box key={i + endpoint + j + k} width="30%">
-                          <Pie data={t} />
-                          <Box display="flex" justifyContent="center" pt={1}>
-                            <Typography
-                              variant="subtitle2"
-                              component="span"
-                              color="textSecondary"
-                            >
-                              {t.label}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      ))}
-                    </Box>
+                <Box py={2} key={i + endpoint + j}>
+                  <Box display="flex" justifyContent="center">
+                    <Typography
+                      variant="subtitle2"
+                      component="span"
+                      color="textSecondary"
+                    >
+                      {type.title}
+                    </Typography>
                   </Box>
-                </>
+                  <Box display="flex" justifyContent="space-between">
+                    {type.data.map((t, k) => (
+                      <Box key={i + endpoint + j + '-' + k} width="30%">
+                        <Pie data={t} />
+                        <Box display="flex" justifyContent="center" pt={1}>
+                          <Typography
+                            variant="subtitle2"
+                            component="span"
+                            color="textSecondary"
+                          >
+                            {t.label}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
               );
             case 'HorizontalBar':
               return (
-                <Box py={2}>
+                <Box py={2} key={i + endpoint + j}>
                   <Bar
-                    key={i + endpoint + j}
                     data={type}
                     options={{
                       ...optionsHorizontal,
@@ -801,7 +906,7 @@ const ResultsCharts = ({ results }) => {
           }
         })}
       </Box>
-    </>
+    </Box>
   ));
 };
 
@@ -1087,6 +1192,7 @@ InfoCard.propTypes = {
   score: PropTypes.number,
   className: PropTypes.string,
   downloadable: PropTypes.bool,
+  cloud_name: PropTypes.string,
 };
 
 InfoCard.defaultProps = {
@@ -1100,10 +1206,14 @@ Info.propTypes = {
   endpoints: PropTypes.array.isRequired,
 };
 
-Deploy.propTypes = {};
+Deploy.propTypes = {
+  config: PropTypes.object,
+};
 
 Test.propTypes = {
   config: PropTypes.object.isRequired,
+  onDeploy: PropTypes.func.isRequired,
+  onConfigChange: PropTypes.func.isRequired,
 };
 
 Results.propTypes = {

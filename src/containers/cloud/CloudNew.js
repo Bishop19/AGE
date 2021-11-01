@@ -322,4 +322,6 @@ GCP.propTypes = {
   region: PropTypes.string.isRequired,
   onRegionChange: PropTypes.func.isRequired,
   onFileUpload: PropTypes.func.isRequired,
+  machine_type: PropTypes.string.isRequired,
+  onMachineTypeChange: PropTypes.func.isRequired,
 };

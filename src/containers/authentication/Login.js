@@ -1,5 +1,5 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
   TextField,
   Button,
@@ -7,24 +7,24 @@ import {
   Grid,
   Typography,
   CircularProgress,
-} from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import AuthService from "../../services/auth.service";
+} from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import AuthService from '../../services/auth.service';
 
 const styles = (theme) => ({
   fullWidth: {
-    width: "100%",
+    width: '100%',
   },
   form: {
-    [theme.breakpoints.only("md")]: {
-      paddingLeft: "10%",
-      paddingRight: "10%",
+    [theme.breakpoints.only('md')]: {
+      paddingLeft: '10%',
+      paddingRight: '10%',
     },
-    [theme.breakpoints.up("lg")]: {
-      paddingLeft: "15%",
-      paddingRight: "15%",
+    [theme.breakpoints.up('lg')]: {
+      paddingLeft: '15%',
+      paddingRight: '15%',
     },
   },
 });
@@ -32,13 +32,13 @@ const styles = (theme) => ({
 const Login = ({ classes, onLogin }) => {
   const formik = useFormik({
     initialValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
       error: null,
     },
     onSubmit: async (values, { setSubmitting, setFieldValue }) => {
       const { email, password } = values;
-      setFieldValue("error", null);
+      setFieldValue('error', null);
 
       const user = await AuthService.login(email, password);
 
@@ -48,7 +48,7 @@ const Login = ({ classes, onLogin }) => {
         onLogin(user);
       } else {
         setFieldValue(
-          "error",
+          'error',
           <Grid item xs={12}>
             <Alert severity="error">Your credentials doesn&#39;t match.</Alert>
           </Grid>
@@ -57,8 +57,8 @@ const Login = ({ classes, onLogin }) => {
       }
     },
     validationSchema: Yup.object().shape({
-      email: Yup.string().required("Email is required"),
-      password: Yup.string().required("Password is required"),
+      email: Yup.string().required('Email is required'),
+      password: Yup.string().required('Password is required'),
     }),
   });
 
@@ -127,7 +127,7 @@ const Login = ({ classes, onLogin }) => {
               {formik.isSubmitting ? (
                 <CircularProgress color="secondary" size={20} />
               ) : (
-                "Login"
+                'Login'
               )}
             </Button>
           </Grid>
