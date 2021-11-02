@@ -119,7 +119,7 @@ const InfoCard = ({
 
   const classes = makeStyles(() => ({
     fullHeight: {
-      height: score ? '160px' : '100px',
+      height: score ? '140px' : '80px',
       width: '200px',
       borderRadius: '20px',
     },
@@ -160,7 +160,7 @@ const InfoCard = ({
           {cloud_name ? (
             <Box display="flex">
               <Box width="40%">
-                <img src={image} alt="Logo" style={{ maxWidth: '100%' }} />
+                <img src={image} alt="Logo" style={{ maxWidth: '85%' }} />
               </Box>
               <Box width="60%" display="flex" alignItems="center">
                 <Typography variant="h6"> {cloud_name} </Typography>
@@ -173,7 +173,7 @@ const InfoCard = ({
         {score && (
           <>
             <Box px={2}>
-              <hr></hr>
+              <hr style={{ margin: 0 }}></hr>
             </Box>
             <Box
               flexGrow={1}

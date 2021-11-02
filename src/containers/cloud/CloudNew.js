@@ -48,18 +48,9 @@ const CloudCard = ({ cloud, onSelect }) => {
         [classes.selected]: cloud.is_selected,
       })}
     >
-      <Box padding={3}>
-        <Box display="flex" justifyContent="center" marginBottom={2}>
-          <img src={cloud.logo} alt="Logo" style={{ maxWidth: '40%' }} />
-        </Box>
-        <hr></hr>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          fontWeight="fontWeightBold"
-        >
-          <Typography variant="h5">{cloud.name}</Typography>
+      <Box padding={2}>
+        <Box display="flex" justifyContent="center">
+          <img src={cloud.logo} alt="Logo" style={{ maxWidth: '50%' }} />
         </Box>
       </Box>
     </Card>
@@ -78,6 +69,7 @@ const GCP = ({
   const zones = [
     { name: 'Europe West 2 C', value: 'europe-west2-c' },
     { name: 'Europe West 4 A', value: 'europe-west4-a' },
+    { name: 'Europe Central 2 A', value: 'europe-central2-a' },
     { name: 'US Central 1 A', value: 'us-central1-a' },
     { name: 'Asia East 2 A', value: 'asia-east2-a' },
   ];
@@ -92,7 +84,7 @@ const GCP = ({
     <Box py={2}>
       <Typography variant="h5">Cloud information</Typography>
       <Typography variant="subtitle1" color="textSecondary" paragraph>
-        Please, provide your service account (JSON file) and your region.
+        Provide your service account (JSON file) and your region.
       </Typography>
       <form>
         <Box display="flex" width="60%">
@@ -323,6 +315,10 @@ const CloudNew = () => {
       <Typography variant="h3">Create a cloud configuration</Typography>
 
       <Box py={2}>
+        <Typography variant="h5">Cloud provider</Typography>
+        <Typography variant="subtitle1" color="textSecondary" paragraph>
+          Select your cloud provider.
+        </Typography>
         <Grid container spacing={3}>
           {clouds.map((cloud, index) => (
             <Grid key={index} item xs={3}>
