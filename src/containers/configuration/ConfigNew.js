@@ -336,7 +336,7 @@ const ConfigNew = () => {
 
   const handleGatewaySelect = (index) => {
     gateways[index].is_selected = !gateways[index].is_selected;
-    setGateways(JSON.parse(JSON.stringify(gateways))); // TODO
+    setGateways(JSON.parse(JSON.stringify(gateways)));
   };
 
   const [clouds, setClouds] = useState([]);
@@ -344,7 +344,7 @@ const ConfigNew = () => {
   const handleCloudSelect = (index) => {
     clouds.forEach((cloud) => (cloud.is_selected = false));
     clouds[index].is_selected = !clouds[index].is_selected;
-    setClouds(JSON.parse(JSON.stringify(clouds))); // TODO
+    setClouds(JSON.parse(JSON.stringify(clouds)));
   };
 
   useEffect(() => {
@@ -422,12 +422,10 @@ const ConfigNew = () => {
     );
 
     if (valid) {
-      // TODO
       setSubmitting(false);
       toast.success('Configuration created!');
       history.push('/configs');
     } else {
-      // TODO
       setSubmitting(false);
       toast.error('Something went wrong!');
     }

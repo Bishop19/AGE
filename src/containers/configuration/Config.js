@@ -252,6 +252,15 @@ const Deploy = ({ config }) => {
       case 'n2-standard-2':
         cpu = 2;
         ram = 8;
+        break;
+      case 'n2-standard-4':
+        cpu = 4;
+        ram = 16;
+        break;
+      case 'e2-medium':
+        cpu = 2;
+        ram = 4;
+        break;
     }
 
     return (
@@ -402,6 +411,12 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
   const [is_visible, setIsVisible] = useState(false);
   const [machine_type, setMachineType] = useState('n2-standard-2');
 
+  const machine_types = [
+    { name: 'N2 Standard 2', value: 'n2-standard-2', specs: '2CPUs, 8GB RAM' },
+    { name: 'N2 Standard 4', value: 'n2-standard-4', specs: '4CPUs, 16GB RAM' },
+    { name: 'E2 Medium 2', value: 'e2-medium', specs: '2CPUs, 4GB RAM' },
+  ];
+
   useEffect(() => {
     const fetchRunningTest = async () => {
       const test = await testsService.getRunningTest(config.id);
@@ -445,7 +460,6 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
       reader.onload = function (event) {
         setFile(event.target.result);
       };
-      // TODO: validate file
     }
   };
 
@@ -610,13 +624,25 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
                       value={machine_type}
                       onChange={(event) => setMachineType(event.target.value)}
                     >
-                      <MenuItem selected="selected" value={'n2-standard-2'}>
-                        N2 Standard 2 (2 CPU, 8GB RAM)
-                      </MenuItem>
-                      <MenuItem value={'e2-standard-2'}>
-                        E2 Standard 2 (2 CPU, 8GB RAM)
-                      </MenuItem>
-                      {/* TODO: ADD MACHINE TYPES */}
+                      {machine_types.map((type, index) => {
+                        if (index === 0) {
+                          return (
+                            <MenuItem
+                              selected="selected"
+                              value={type.value}
+                              key={type.value}
+                            >
+                              {type.name} ({type.specs})
+                            </MenuItem>
+                          );
+                        } else {
+                          return (
+                            <MenuItem value={type.value} key={type.value}>
+                              {type.name} ({type.specs})
+                            </MenuItem>
+                          );
+                        }
+                      })}
                     </Select>
                   </FormControl>
                 </Grid>

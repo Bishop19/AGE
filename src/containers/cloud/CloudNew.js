@@ -75,6 +75,19 @@ const GCP = ({
   onRegionChange,
   onMachineTypeChange,
 }) => {
+  const zones = [
+    { name: 'Europe West 2 C', value: 'europe-west2-c' },
+    { name: 'Europe West 4 A', value: 'europe-west4-a' },
+    { name: 'US Central 1 A', value: 'us-central1-a' },
+    { name: 'Asia East 2 A', value: 'asia-east2-a' },
+  ];
+
+  const machine_types = [
+    { name: 'N2 Standard 2', value: 'n2-standard-2', specs: '2CPUs, 8GB RAM' },
+    { name: 'N2 Standard 4', value: 'n2-standard-4', specs: '4CPUs, 16GB RAM' },
+    { name: 'E2 Medium 2', value: 'e2-medium', specs: '2CPUs, 4GB RAM' },
+  ];
+
   return (
     <Box py={2}>
       <Typography variant="h5">Cloud information</Typography>
@@ -118,13 +131,25 @@ const GCP = ({
                     value={region}
                     onChange={(event) => onRegionChange(event.target.value)}
                   >
-                    <MenuItem selected="selected" value={'europe-west4-a'}>
-                      Europe West 4 A
-                    </MenuItem>
-                    <MenuItem value={'europe-west2-c'}>
-                      Europe West 2 C
-                    </MenuItem>
-                    {/* TODO: ADD ZONES */}
+                    {zones.map((zone, index) => {
+                      if (index === 0) {
+                        return (
+                          <MenuItem
+                            selected="selected"
+                            value={zone.value}
+                            key={zone.value}
+                          >
+                            {zone.name}
+                          </MenuItem>
+                        );
+                      } else {
+                        return (
+                          <MenuItem value={zone.value} key={zone.value}>
+                            {zone.name}
+                          </MenuItem>
+                        );
+                      }
+                    })}
                   </Select>
                 </FormControl>
               </Grid>
@@ -139,13 +164,25 @@ const GCP = ({
                       onMachineTypeChange(event.target.value)
                     }
                   >
-                    <MenuItem selected="selected" value={'n2-standard-2'}>
-                      N2 Standard 2 (2 CPU, 8GB RAM)
-                    </MenuItem>
-                    <MenuItem value={'n2-standard-4'}>
-                      N2 Standard 4 (4 CPU, 16GB RAM)
-                    </MenuItem>
-                    {/* TODO: ADD MACHINE TYPES */}
+                    {machine_types.map((type, index) => {
+                      if (index === 0) {
+                        return (
+                          <MenuItem
+                            selected="selected"
+                            value={type.value}
+                            key={type.value}
+                          >
+                            {type.name} ({type.specs})
+                          </MenuItem>
+                        );
+                      } else {
+                        return (
+                          <MenuItem value={type.value} key={type.value}>
+                            {type.name} ({type.specs})
+                          </MenuItem>
+                        );
+                      }
+                    })}
                   </Select>
                 </FormControl>
               </Grid>
@@ -153,6 +190,39 @@ const GCP = ({
           </Box>
         </Box>
       </form>
+    </Box>
+  );
+};
+
+const AWS = () => {
+  return (
+    <Box py={2}>
+      <Typography variant="h5">Cloud information</Typography>
+      <Typography variant="subtitle1" color="textSecondary" paragraph>
+        Not implemented yet.
+      </Typography>
+    </Box>
+  );
+};
+
+const Azure = () => {
+  return (
+    <Box py={2}>
+      <Typography variant="h5">Cloud information</Typography>
+      <Typography variant="subtitle1" color="textSecondary" paragraph>
+        Not implemented yet.
+      </Typography>
+    </Box>
+  );
+};
+
+const NoCloudSelected = () => {
+  return (
+    <Box py={2}>
+      <Typography variant="h5">Cloud information</Typography>
+      <Typography variant="subtitle1" color="textSecondary" paragraph>
+        You have to select a cloud provider.
+      </Typography>
     </Box>
   );
 };
@@ -169,6 +239,31 @@ const CloudNew = () => {
   const [region, setRegion] = useState('europe-west4-a');
   const [name, setName] = useState('');
   const [machine_type, setMachineType] = useState('n2-standard-2');
+  const [strategy, setStrategy] = useState('GCP');
+
+  const renderStrategy = (strategy) => {
+    switch (strategy) {
+      case 'GCP':
+        return (
+          <GCP
+            name={name}
+            region={region}
+            machine_type={machine_type}
+            onNameChange={setName}
+            onRegionChange={setRegion}
+            onFileUpload={parseFile}
+            onMachineTypeChange={setMachineType}
+          />
+        );
+
+      case 'AWS':
+        return <AWS />;
+      case 'Azure':
+        return <Azure />;
+      default:
+        return <NoCloudSelected />;
+    }
+  };
 
   const handleCloudSelect = (index) => {
     clouds.forEach((c, i) => {
@@ -176,7 +271,13 @@ const CloudNew = () => {
       else clouds[index].is_selected = !clouds[index].is_selected;
     });
 
-    setClouds(JSON.parse(JSON.stringify(clouds))); // TODO
+    if (clouds[index].is_selected) {
+      setStrategy(clouds[index].name);
+    } else {
+      setStrategy(null);
+    }
+
+    setClouds(JSON.parse(JSON.stringify(clouds)));
   };
 
   const handleBackClick = () => {
@@ -196,12 +297,10 @@ const CloudNew = () => {
     );
 
     if (cloud) {
-      // TODO
       setSubmitting(false);
       toast.success('Cloud created!');
       history.push('/clouds');
     } else {
-      // TODO
       setSubmitting(false);
       toast.error('Something went wrong');
     }
@@ -222,9 +321,6 @@ const CloudNew = () => {
   return (
     <>
       <Typography variant="h3">Create a cloud configuration</Typography>
-      <Typography variant="subtitle1" color="textSecondary" paragraph>
-        TODO
-      </Typography>
 
       <Box py={2}>
         <Grid container spacing={3}>
@@ -241,46 +337,7 @@ const CloudNew = () => {
 
       <hr></hr>
 
-      <GCP
-        name={name}
-        region={region}
-        machine_type={machine_type}
-        onNameChange={setName}
-        onRegionChange={setRegion}
-        onFileUpload={parseFile}
-        onMachineTypeChange={setMachineType}
-      />
-
-      {/* <Box py={2}>
-        <Typography variant="h5">Machine Specification</Typography>
-        <Typography variant="subtitle1" color="textSecondary" paragraph>
-          Choose the hardware in which the API Gateway will be deployed.
-        </Typography>
-        <form>
-          <Box display="flex">
-            <Box display="flex" flexGrow={1} pr={12}>
-              <Grid container spacing={2}>
-                <Grid item xs={2}>
-                  CPU
-                </Grid>
-                <Grid item xs={10}>
-                  <TextField fullWidth label="CPU" variant="outlined" />
-                </Grid>
-              </Grid>
-            </Box>
-            <Box display="flex" flexGrow={1} pr={12}>
-              <Grid container spacing={2}>
-                <Grid item xs={2}>
-                  RAM
-                </Grid>
-                <Grid item xs={10}>
-                  <TextField fullWidth label="RAM" variant="outlined" />
-                </Grid>
-              </Grid>
-            </Box>
-          </Box>
-        </form>
-      </Box> */}
+      {renderStrategy(strategy)}
 
       <hr></hr>
 
