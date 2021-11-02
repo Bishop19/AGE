@@ -6,5 +6,7 @@ export const parseGatewayName = (gateway) => {
       return 'Kong';
     case 'tyk':
       return 'Tyk';
+    default:
+      return '';
   }
 };

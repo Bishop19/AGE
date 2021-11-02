@@ -737,28 +737,30 @@ const ResultsCharts = ({ results }) => {
         title: 'Percentiles',
         chart: 'Bar',
         labels: ['Median', '90%', '95%', '99%'],
-        datasets: endpoints.map((_, index) => ({
-          label: parseGatewayName(results[index].gateway),
-          data: [
-            results[index].metrics[endpoint]['Median'],
-            results[index].metrics[endpoint]['90% Line'],
-            results[index].metrics[endpoint]['95% Line'],
-            results[index].metrics[endpoint]['99% Line'],
-          ],
-          backgroundColor: colors[index],
-        })),
+        datasets: results.map((gateway, index) => {
+          return {
+            label: parseGatewayName(gateway.gateway),
+            data: [
+              gateway.metrics[endpoint]['Median'],
+              gateway.metrics[endpoint]['90% Line'],
+              gateway.metrics[endpoint]['95% Line'],
+              gateway.metrics[endpoint]['99% Line'],
+            ],
+            backgroundColor: colors[index],
+          };
+        }),
       },
       {
         title: 'Min, Average, Max, Std. Dev.',
         chart: 'Bar',
         labels: ['Min', 'Average', 'Max', 'Std. Dev.'],
-        datasets: endpoints.map((_, index) => ({
-          label: parseGatewayName(results[index].gateway),
+        datasets: results.map((gateway, index) => ({
+          label: parseGatewayName(gateway.gateway),
           data: [
-            results[index].metrics[endpoint]['Min'],
-            results[index].metrics[endpoint]['Average'],
-            results[index].metrics[endpoint]['Max'],
-            results[index].metrics[endpoint]['Std. Dev.'],
+            gateway.metrics[endpoint]['Min'],
+            gateway.metrics[endpoint]['Average'],
+            gateway.metrics[endpoint]['Max'],
+            gateway.metrics[endpoint]['Std. Dev.'],
           ],
           backgroundColor: colors[index],
         })),
@@ -766,14 +768,14 @@ const ResultsCharts = ({ results }) => {
       {
         title: 'Success/Error rate',
         chart: 'Pie',
-        data: results.map((result) => ({
+        data: results.map((gateway) => ({
           labels: ['Success', 'Error'],
-          label: parseGatewayName(result.gateway),
+          label: parseGatewayName(gateway.gateway),
           datasets: [
             {
               data: [
-                100 - parseFloat(result.metrics[endpoint]['Error %']),
-                parseFloat(result.metrics[endpoint]['Error %']),
+                100 - parseFloat(gateway.metrics[endpoint]['Error %']),
+                parseFloat(gateway.metrics[endpoint]['Error %']),
               ],
               backgroundColor: [colors[3], colors[4]],
             },
