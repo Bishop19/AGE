@@ -10,6 +10,7 @@ class Test(db.Model):
     results = db.relationship("Result", lazy="dynamic")
     is_finished = db.Column(db.Boolean, default=False)
     machine_type = db.Column(db.String(64), nullable=False)
+    region = db.Column(db.String(64), nullable=False)
     start_date = db.Column(db.DateTime, default=datetime.utcnow)
     finish_date = db.Column(db.DateTime)
     config_id = db.Column(db.Integer, db.ForeignKey("config.id"))
@@ -25,6 +26,7 @@ class Test(db.Model):
             "test_file": TestFile.query.get(self.test_file_id).to_dict(),
             "start_date": self.start_date,
             "finish_date": self.finish_date,
+            "region": self.region,
         }
 
     def to_dict_short(self):
@@ -37,11 +39,12 @@ class Test(db.Model):
             "config_id": self.config_id,
         }
 
-    def __init__(self, name, machine_type, config_id, test_file_id):
+    def __init__(self, name, machine_type, config_id, test_file_id, region):
         self.name = name
         self.machine_type = machine_type
         self.config_id = config_id
         self.test_file_id = test_file_id
+        self.region = region
 
     def __repr__(self):
         return f"<Test {self.id} from config {self.config_id}>"

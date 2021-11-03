@@ -19,7 +19,16 @@ class Tool(ABC):
 
 class LoadTest:
     def __init__(
-        self, tool: Tool, test_file, token, config_id, test_id, instances, machine_type
+        self,
+        tool: Tool,
+        test_file,
+        token,
+        config_id,
+        test_id,
+        instances,
+        machine_type,
+        zone,
+        account,
     ) -> None:
         self._tool = tool
         self.test_file = test_file
@@ -28,6 +37,8 @@ class LoadTest:
         self.test_id = test_id
         self.instances = instances
         self.machine_type = machine_type
+        self.zone = zone
+        self.account = account
 
     @property
     def tool(self) -> Tool:
@@ -37,12 +48,12 @@ class LoadTest:
     def tool(self, tool: Tool) -> None:
         self._tool = tool
 
-    def __wait_for_operation(self, compute, project, zone, operation):
+    def __wait_for_operation(self, compute, project, operation):
         print("Waiting for operation to finish...")
         while True:
             result = (
                 compute.zoneOperations()
-                .get(project=project, zone=zone, operation=operation)
+                .get(project=project, zone=self.zone, operation=operation)
                 .execute()
             )
 
@@ -56,7 +67,7 @@ class LoadTest:
 
             time.sleep(1)
 
-    def __create_instance(self, compute, project, zone, startup_script):
+    def __create_instance(self, compute, project, startup_script):
         # Get Ubuntu image.
         image_response = (
             compute.images()
@@ -66,7 +77,7 @@ class LoadTest:
         source_disk_image = image_response["selfLink"]
 
         # Configure the machine
-        machine_type = f"zones/{zone}/machineTypes/{self.machine_type}"
+        machine_type = f"zones/{self.zone}/machineTypes/{self.machine_type}"
 
         config = {
             "name": "load-tester-" + str(self.config_id) + "-" + str(self.test_id),
@@ -111,7 +122,7 @@ class LoadTest:
 
         return (
             compute.instances()
-            .insert(project=project, zone=zone, body=config)
+            .insert(project=project, zone=self.zone, body=config)
             .execute()
         )
 
@@ -141,30 +152,29 @@ class LoadTest:
 
         return items
 
-    def __cloud_operations(self, compute, project, zone, startup_script):
+    def __cloud_operations(self, compute, project, startup_script):
         print("Cloud operations started")
 
         # self.create_firewall_rules(compute, project)
 
-        operation = self.__create_instance(compute, project, zone, startup_script)
-        self.__wait_for_operation(compute, project, zone, operation["name"])
+        operation = self.__create_instance(compute, project, startup_script)
+        self.__wait_for_operation(compute, project, operation["name"])
 
         print("Cloud operations finished")
 
     def deploy(self):
-        project = os.getenv("CLOUD_PROJECT")
-        zone = os.getenv("CLOUD_ZONE")
-        account = json.loads(os.getenv("CLOUD_CREDENTIALS"))
-
+        project = self.account["project_id"]
         startup_script = self._tool.get_startup_script()
 
-        credentials = service_account.Credentials.from_service_account_info(account)
+        credentials = service_account.Credentials.from_service_account_info(
+            self.account
+        )
         compute = googleapiclient.discovery.build(
             "compute", "v1", credentials=credentials
         )
 
         thread = threading.Thread(
             target=self.__cloud_operations,
-            args=(compute, project, zone, startup_script),
+            args=(compute, project, startup_script),
         )
         thread.start()

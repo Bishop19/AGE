@@ -2,7 +2,6 @@ from datetime import datetime
 import re
 import csv
 import math
-from random import randint
 from flask import json, jsonify, request
 from flask_jwt_extended.utils import create_access_token, get_jwt_identity
 from app import db
@@ -61,36 +60,48 @@ def create_test(config_id):
     if not machine_type:
         return error_response(400, "No machine type provided")
 
+    region = data.get("region") or None
+
+    if not region:
+        return error_response(400, "No region provided")
+
     # Create test
     test = Test(
         name=name,
         machine_type=machine_type,
         config_id=config_id,
         test_file_id=test_file["id"],
+        region=region,
     )
-
-    # Get JWT to post test results
-    user_id = get_jwt_identity()["id"]
-    user = User.query.get(user_id)
-
-    token = create_access_token(identity=user.to_dict())
-
-    # Get config instances
-    config = Config.query.get(config_id)
 
     # Save test to get an ID
     db.session.add(test)
     db.session.commit()
 
+    # Get JWT to post test results
+    user_id = get_jwt_identity()["id"]
+    user = User.query.get(user_id)
+    token = create_access_token(identity=user.to_dict())
+
+    # Get config instances
+    config = Config.query.get(config_id)
+    instances = config.instances.all()
+
+    # Get cloud credentials
+    cloud = config.cloud.cloud
+    credentials = cloud.provider.credentials
+
     # Start test
     tool = LoadTest(
-        JMeter(),
+        JMeter(),  # TODO: set strategy based on test file
         test_file["content"],
         token=token,
         config_id=config_id,
         test_id=test.id,
-        instances=config.instances.all(),
+        instances=instances,
         machine_type=test.machine_type,
+        zone=region,
+        account=credentials,
     )
     tool.deploy()
 
