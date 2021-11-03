@@ -42,12 +42,13 @@ const getTest = (config_id, test_id) => {
     });
 };
 
-const createTest = (config_id, name, test_file, machine_type) => {
+const createTest = (config_id, name, test_file, machine_type, region) => {
   return instance
     .post(`/configurations/${config_id}/tests`, {
       name,
       test_file,
       machine_type,
+      region,
     })
     .then((response) => {
       return response.data;

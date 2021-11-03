@@ -26,7 +26,7 @@ const getDashboardInfo = () => {
     })
     .catch((error) => {
       console.error('Error:', error.response?.data);
-      return [];
+      return false;
     });
 };
 

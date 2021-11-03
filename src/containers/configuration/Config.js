@@ -410,11 +410,20 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
   const [file, setFile] = useState(null);
   const [is_visible, setIsVisible] = useState(false);
   const [machine_type, setMachineType] = useState('n2-standard-2');
+  const [region, setRegion] = useState('europe-west2-c');
 
   const machine_types = [
     { name: 'N2 Standard 2', value: 'n2-standard-2', specs: '2CPUs, 8GB RAM' },
     { name: 'N2 Standard 4', value: 'n2-standard-4', specs: '4CPUs, 16GB RAM' },
     { name: 'E2 Medium 2', value: 'e2-medium', specs: '2CPUs, 4GB RAM' },
+  ];
+
+  const zones = [
+    { name: 'Europe West 2 C', value: 'europe-west2-c' },
+    { name: 'Europe West 4 A', value: 'europe-west4-a' },
+    { name: 'Europe Central 2 A', value: 'europe-central2-a' },
+    { name: 'US Central 1 A', value: 'us-central1-a' },
+    { name: 'Asia East 2 A', value: 'asia-east2-a' },
   ];
 
   useEffect(() => {
@@ -441,7 +450,8 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
       config.id,
       name,
       test_file,
-      machine_type
+      machine_type,
+      region
     );
 
     if (valid) {
@@ -639,6 +649,38 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
                           return (
                             <MenuItem value={type.value} key={type.value}>
                               {type.name} ({type.specs})
+                            </MenuItem>
+                          );
+                        }
+                      })}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={2}>
+                  Region
+                </Grid>
+                <Grid item xs={10}>
+                  <FormControl variant="outlined" style={{ width: '100%' }}>
+                    <Select
+                      value={region}
+                      onChange={(event) => setRegion(event.target.value)}
+                    >
+                      {zones.map((zone, index) => {
+                        if (index === 0) {
+                          return (
+                            <MenuItem
+                              selected="selected"
+                              value={zone.value}
+                              key={zone.value}
+                            >
+                              {zone.name}
+                            </MenuItem>
+                          );
+                        } else {
+                          return (
+                            <MenuItem value={zone.value} key={zone.value}>
+                              {zone.name}
                             </MenuItem>
                           );
                         }
