@@ -164,6 +164,7 @@ def calculate_scores(results):
         "Median",
         "Std. Dev.",
         "Throughput",
+        "Error %",
     ]
     scores = {}
     for gateway in results:
@@ -173,7 +174,10 @@ def calculate_scores(results):
         values = []
         metric_scores = []
         for gateway, result in results.items():
-            values.append((float(result["TOTAL"][metric]), gateway))
+            if metric == "Error %":
+                values.append((float(result["TOTAL"][metric].strip("%")), gateway))
+            else:
+                values.append((float(result["TOTAL"][metric]), gateway))
 
         if metric == "Throughput":
             maximum = max(values, key=lambda item: item[0])
@@ -188,17 +192,21 @@ def calculate_scores(results):
             minimum = (float(minimum[0]), minimum[1])
 
             for value in values:
-                if minimum[0] == 0:
-                    score = 0
+                if value[0] == 0 and metric != "Error %":
+                    score = 1
+                if metric == "Error %":
+                    score = 1 - (value[0] / 100)
                 else:
                     score = 1 - (math.fabs(minimum[0] - value[0]) / value[0])
-
                 metric_scores.append((value[1], score))
+
+                if metric == "Error %":  # Double weight -> +1 length
+                    metric_scores.append((value[1], score))
 
         for (gateway, score) in metric_scores:
             scores[gateway].append(score)
 
-    return {k: calculate_score(v, len(metrics)) for k, v in scores.items()}
+    return {k: calculate_score(v, len(metrics) + 1) for k, v in scores.items()}
 
 
 @bp.route("/configurations/<int:config_id>/tests/<int:test_id>", methods=["PUT"])

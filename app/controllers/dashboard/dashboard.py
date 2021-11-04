@@ -10,9 +10,11 @@ from app.models.test import Test
 def parse_test_running(t):
     test = t[0]
     gateways = json.loads(t[1])
+    name = t[2]
 
     test = test.to_dict_short()
     test["gateways"] = gateways
+    test["config"] = name
 
     return test
 
@@ -22,6 +24,7 @@ def get_running_tests(user_id):
         Test.query.filter_by(is_finished=False)
         .join(Config)
         .add_columns(Config._gateways)
+        .add_columns(Config.name)
         .filter_by(user_id=user_id)
         .all()
     )
