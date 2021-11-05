@@ -149,8 +149,12 @@ def get_results_from_data(data):
     return results
 
 
-def calculate_score(scores, total):
-    return math.ceil(sum(scores) * 100 / total)
+def calculate_score(scores, total, results, gateway):
+    for endpoint, values in scores.items():
+        scores[endpoint] = math.floor(sum(values) * 100 / total)
+        results[gateway][endpoint]["Score"] = scores[endpoint]
+
+    return results[gateway]["TOTAL"]["Score"]
 
 
 def calculate_scores(results):
@@ -166,47 +170,56 @@ def calculate_scores(results):
         "Throughput",
         "Error %",
     ]
+
     scores = {}
     for gateway in results:
-        scores[gateway] = []
+        scores[gateway] = {}
+        for endpoint in results[gateway]:
+            scores[gateway][endpoint] = []
+
+    endpoints = list(list(scores.values())[0].keys())
 
     for metric in metrics:
-        values = []
-        metric_scores = []
-        for gateway, result in results.items():
-            if metric == "Error %":
-                values.append((float(result["TOTAL"][metric].strip("%")), gateway))
-            else:
-                values.append((float(result["TOTAL"][metric]), gateway))
-
-        if metric == "Throughput":
-            maximum = max(values, key=lambda item: item[0])
-            maximum = (float(maximum[0]), maximum[1])
-
-            for value in values:
-                score = 1 - (math.fabs(maximum[0] - value[0]) / maximum[0])
-                metric_scores.append((value[1], score))
-
-        else:
-            minimum = min(values, key=lambda item: item[0])
-            minimum = (float(minimum[0]), minimum[1])
-
-            for value in values:
-                if value[0] == 0 and metric != "Error %":
-                    score = 1
+        for endpoint in endpoints:
+            values = []
+            metric_scores = []
+            for gateway, result in results.items():
                 if metric == "Error %":
-                    score = 1 - (value[0] / 100)
+                    values.append((float(result[endpoint][metric].strip("%")), gateway))
                 else:
-                    score = 1 - (math.fabs(minimum[0] - value[0]) / value[0])
-                metric_scores.append((value[1], score))
+                    values.append((float(result[endpoint][metric]), gateway))
 
-                if metric == "Error %":  # Double weight -> +1 length
+            if metric == "Throughput":
+                maximum = max(values, key=lambda item: item[0])
+                maximum = (float(maximum[0]), maximum[1])
+
+                for value in values:
+                    score = 1 - (math.fabs(maximum[0] - value[0]) / maximum[0])
                     metric_scores.append((value[1], score))
 
-        for (gateway, score) in metric_scores:
-            scores[gateway].append(score)
+            else:
+                minimum = min(values, key=lambda item: item[0])
+                minimum = (float(minimum[0]), minimum[1])
 
-    return {k: calculate_score(v, len(metrics) + 1) for k, v in scores.items()}
+                for value in values:
+                    if value[0] == 0 and metric != "Error %":
+                        score = 1
+                    if metric == "Error %":
+                        score = 1 - (value[0] / 100)
+                    else:
+                        score = 1 - (math.fabs(minimum[0] - value[0]) / value[0])
+                    metric_scores.append((value[1], score))
+
+                    if metric == "Error %":  # Double weight -> +1 length
+                        metric_scores.append((value[1], score))
+
+            for (gateway, score) in metric_scores:
+                scores[gateway][endpoint].append(score)
+
+    return {
+        gateway: calculate_score(values, len(metrics) + 1, results, gateway)
+        for gateway, values in scores.items()
+    }
 
 
 @bp.route("/configurations/<int:config_id>/tests/<int:test_id>", methods=["PUT"])
@@ -226,9 +239,9 @@ def test_results(config_id, test_id):
         return error_response(400, "Test already has results")
 
     # Check request data
-    data = re.sub(r"(\d)\n(\w)", r"\1||\2", request.get_data(as_text=True))
-    data = re.sub(r"(Dev\.)\n", r"\1||", data)
-    data = json.loads(data)
+    # data = re.sub(r"(\d)\n(\w)", r"\1||\2", request.get_data(as_text=True))
+    # data = re.sub(r"(Dev\.)\n", r"\1||", data)
+    data = json.loads(request.get_data(as_text=True))
 
     results = get_results_from_data(data)
 
@@ -251,6 +264,43 @@ def test_results(config_id, test_id):
 
     test.is_finished = True
     test.finish_date = datetime.utcnow()
+
+    db.session.add(test)
+    db.session.commit()
+
+    return jsonify(test.to_dict())
+
+
+@bp.route(
+    "/configurations/<int:config_id>/tests/<int:test_id>/recalculate", methods=["PUT"]
+)
+@validate_user()
+@check_config_ownership()
+def recalculate_test_scores(config_id, test_id):
+    # Get test
+    test = Test.query.get(test_id)
+
+    if not test:
+        return error_response(404, "Test not found")
+
+    if test.config_id != config_id:
+        return error_response(400, "Test doesn't belong to provided config")
+
+    # Check request data
+    # data = re.sub(r"(\d)\n(\w)", r"\1||\2", request.get_data(as_text=True))
+    # data = re.sub(r"(Dev\.)\n", r"\1||", data)
+    data = json.loads(request.get_data(as_text=True))
+
+    results = get_results_from_data(data)
+
+    scores = calculate_scores(results)
+
+    for gateway in results:
+        for result in test.results:
+            if result.gateway == gateway:
+                result.score = scores[gateway]
+                result.metrics = results[gateway]
+                break
 
     db.session.add(test)
     db.session.commit()
