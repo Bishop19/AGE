@@ -37,10 +37,15 @@ def parse_test_latest_results(t):
     test = t[0]
     name = t[1]
 
-    result = max(test.results, key=lambda item: item.score)
-    test = test.to_dict_short()
-    test["config"] = name
-    test["gateway"] = result.gateway
+    try:
+        result = max(test.results.all(), key=lambda item: item.score)
+        test = test.to_dict_short()
+        test["config"] = name
+        test["gateway"] = result.gateway
+    except:
+        test = test.to_dict_short()
+        test["config"] = "error"
+        test["gateway"] = "error"
 
     return test
 
