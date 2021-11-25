@@ -71,7 +71,7 @@ class LoadTest:
         # Get Ubuntu image.
         image_response = (
             compute.images()
-            .getFromFamily(project="ubuntu-os-cloud", family="ubuntu-minimal-1604-lts")
+            .getFromFamily(project="ubuntu-os-cloud", family="ubuntu-1804-lts")
             .execute()
         )
         source_disk_image = image_response["selfLink"]
