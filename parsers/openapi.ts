@@ -4,10 +4,9 @@ import { Endpoint, Parser, Param, Config } from './interfaces';
 
 // ONLY ACCEPTS OPENAPI 3; TODO OPENAPI2
 export default class OpenAPIParser implements Parser {
-  
   private parseParameterType(parameter: any): Param {
     let type = parameter.schema.type;
-    
+
     if (type == 'array') type = '[' + parameter.schema.items.type + ']';
 
     return type;
@@ -18,14 +17,16 @@ export default class OpenAPIParser implements Parser {
     const body = request.content['application/json']?.schema;
 
     if (body) {
-      Object.entries(body.properties).forEach(([param, type]: [string, any]) => (params[param] = type));
+      Object.entries(body.properties).forEach(
+        ([param, type]: [string, any]) => (params[param] = type)
+      );
     }
 
     return params;
   }
 
   private formatBasePath(path: string): string {
-    if (path.charAt(path.length-1) === '/') path = path.slice(0, -1);
+    if (path.charAt(path.length - 1) === '/') path = path.slice(0, -1);
     return path;
   }
 
@@ -36,11 +37,19 @@ export default class OpenAPIParser implements Parser {
       Object.entries(methods).forEach(([method, info]) => {
         const query_params: Record<string, Param> = {};
         const path_params: Record<string, Param> = {};
-        let base_path: string = (api as any).servers ? this.formatBasePath((api as any).servers[0].url) : ""
-        
+        let is_service: boolean = false;
+        let base_path: string = (api as any).servers
+          ? this.formatBasePath((api as any).servers[0].url)
+          : '';
+
         // Check if the base path is different from the default
-        if((info as any).servers) {
-          base_path = this.formatBasePath((info as any).servers[0].url);  
+        if ((info as any).servers) {
+          base_path = this.formatBasePath((info as any).servers[0].url);
+        }
+
+        // Check if endpoint_path should be ignored (server only)
+        if ((info as any).description === 'server only') {
+          is_service = true;
         }
 
         // Parse parameters (path & query)
@@ -79,9 +88,12 @@ export default class OpenAPIParser implements Parser {
           path_params,
           body_params,
           security,
+          is_service,
         });
       });
     });
+
+    console.log(endpoints);
 
     return endpoints;
   }

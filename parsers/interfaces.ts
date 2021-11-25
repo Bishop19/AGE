@@ -6,6 +6,7 @@ export interface Endpoint {
   path_params: Record<string, Param>;
   body_params: Record<string, Param>;
   security: string;
+  is_service: boolean;
 }
 
 export interface Config {

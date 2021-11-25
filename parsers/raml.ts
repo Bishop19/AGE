@@ -13,6 +13,7 @@ export default class RAMLParser implements Parser {
           path_params: {},
           body_params: {},
           security: 'None',
+          is_service: false,
         },
       ],
     };

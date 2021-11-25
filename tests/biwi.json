@@ -40,7 +40,7 @@
       "post": {
         "servers": [
           {
-            "url": "http://34.142.97.91:12000/"
+            "url": "http://34.118.15.57:12000/"
           }
         ],
         "tags": [
@@ -67,7 +67,7 @@
       "post": {
         "servers": [
           {
-            "url": "http://34.142.97.91:12000/"
+            "url": "http://34.118.15.57:12000/"
           }
         ],
         "tags": [
@@ -77,7 +77,21 @@
         "operationId": "loginUser",
         "requestBody": {
           "description": "Configuration object that needs to be created",
-          "content": {},
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          },
           "required": true
         },
         "responses": {
@@ -99,7 +113,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:12000/"
+            "url": "http://34.118.15.57:12000/"
           }
         ],
         "tags": [
@@ -128,7 +142,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:12000/"
+            "url": "http://34.118.15.57:12000/"
           }
         ],
         "tags": [
@@ -168,7 +182,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:12000/"
+            "url": "http://34.118.15.57:12000/"
           }
         ],
         "tags": [
@@ -195,7 +209,7 @@
       "post": {
         "servers": [
           {
-            "url": "http://34.142.97.91:12000/"
+            "url": "http://34.118.15.57:12000/"
           }
         ],
         "tags": [
@@ -224,7 +238,7 @@
       "delete": {
         "servers": [
           {
-            "url": "http://34.142.97.91:12000/"
+            "url": "http://34.118.15.57:12000/"
           }
         ],
         "tags": [
@@ -264,7 +278,7 @@
       "delete": {
         "servers": [
           {
-            "url": "http://34.142.97.91:12000/"
+            "url": "http://34.118.15.57:12000/"
           }
         ],
         "tags": [
@@ -304,7 +318,7 @@
       "post": {
         "servers": [
           {
-            "url": "http://34.142.97.91:12000/"
+            "url": "http://34.118.15.57:12000/"
           }
         ],
         "tags": [
@@ -344,7 +358,7 @@
       "post": {
         "servers": [
           {
-            "url": "http://34.142.97.91:12000/"
+            "url": "http://34.118.15.57:12000/"
           }
         ],
         "tags": [
@@ -373,7 +387,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:14000/"
+            "url": "http://34.118.15.57:14000/"
           }
         ],
         "tags": [
@@ -422,7 +436,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:14000/"
+            "url": "http://34.118.15.57:14000/"
           }
         ],
         "tags": [
@@ -455,7 +469,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:14000/"
+            "url": "http://34.118.15.57:14000/"
           }
         ],
         "tags": [
@@ -488,7 +502,7 @@
       "post": {
         "servers": [
           {
-            "url": "http://34.142.97.91:14000/"
+            "url": "http://34.118.15.57:14000/"
           }
         ],
         "tags": [
@@ -528,7 +542,7 @@
       "delete": {
         "servers": [
           {
-            "url": "http://34.142.97.91:14000/"
+            "url": "http://34.118.15.57:14000/"
           }
         ],
         "tags": [
@@ -564,11 +578,40 @@
         ]
       }
     },
+    "/description": {
+      "post": {
+        "servers": [
+          {
+            "url": "http://34.118.15.57:10000/"
+          }
+        ],
+        "tags": [
+          "Description"
+        ],
+        "summary": "Creates a new auction",
+        "operationId": "createAuctionInfo",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/description/{auctionID}": {
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:10000/"
+            "url": "http://34.118.15.57:10000/"
           }
         ],
         "tags": [
@@ -608,7 +651,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:10000/"
+            "url": "http://34.118.15.57:10000/"
           }
         ],
         "tags": [
@@ -643,7 +686,7 @@
       "post": {
         "servers": [
           {
-            "url": "http://34.142.97.91:11000/"
+            "url": "http://34.118.15.57:11000/"
           }
         ],
         "tags": [
@@ -667,7 +710,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:11000/"
+            "url": "http://34.118.15.57:11000/"
           }
         ],
         "tags": [
@@ -691,7 +734,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:11000/"
+            "url": "http://34.118.15.57:11000/"
           }
         ],
         "tags": [
@@ -715,7 +758,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:13000/"
+            "url": "http://34.118.15.57:13000/"
           }
         ],
         "tags": [
@@ -751,7 +794,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:13000/"
+            "url": "http://34.118.15.57:13000/"
           }
         ],
         "tags": [
@@ -774,7 +817,7 @@
       "post": {
         "servers": [
           {
-            "url": "http://34.142.97.91:13000/"
+            "url": "http://34.118.15.57:13000/"
           }
         ],
         "tags": [
@@ -797,7 +840,7 @@
       "put": {
         "servers": [
           {
-            "url": "http://34.142.97.91:13000/"
+            "url": "http://34.118.15.57:13000/"
           }
         ],
         "tags": [
@@ -820,7 +863,7 @@
       "delete": {
         "servers": [
           {
-            "url": "http://34.142.97.91:13000/"
+            "url": "http://34.118.15.57:13000/"
           }
         ],
         "tags": [
@@ -845,7 +888,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:15000/"
+            "url": "http://34.118.15.57:15000/"
           }
         ],
         "tags": [
@@ -885,7 +928,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:15000/"
+            "url": "http://34.118.15.57:15000/"
           }
         ],
         "tags": [
@@ -914,7 +957,7 @@
       "get": {
         "servers": [
           {
-            "url": "http://34.142.97.91:15000/"
+            "url": "http://34.118.15.57:15000/"
           }
         ],
         "tags": [
@@ -954,7 +997,7 @@
       "post": {
         "servers": [
           {
-            "url": "http://34.142.97.91:15000/"
+            "url": "http://34.118.15.57:15000/"
           }
         ],
         "tags": [
