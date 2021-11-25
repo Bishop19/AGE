@@ -47,8 +47,8 @@ if [ ! -z "$TEST_FILE_KONG" ]; then
     sudo ./jmeter.sh -n -t test_kong.jmx -l test_kong.jtl;
     sudo ./JMeterPluginsCMD.sh --generate-csv results_kong.csv --input-jtl test_kong.jtl --plugin-type AggregateReport;
     RESULTS_KONG=$(<results_kong.csv)
-    RESULTS_KONG=$(sed -z "s/Dev\. /Dev.||/g" <<< $RESULTS_KONG)
-    RESULTS_KONG=$(sed -r "s/([0-9]) /\1||/g" <<< $RESULTS_KONG)
+    RESULTS_KONG=$(sed -z "s/Dev\.\s/Dev.||/g" <<< $RESULTS_KONG)
+    RESULTS_KONG=$(sed -r "s/([0-9])\s([a-zA-Z])/\1||\2/g" <<< $RESULTS_KONG)
 else
     echo "NO KONG CONFIG"
 fi
@@ -63,8 +63,8 @@ if [ ! -z "$TEST_FILE_KRAKEND" ]; then
     sudo ./jmeter.sh -n -t test_krakend.jmx -l test_krakend.jtl;
     sudo ./JMeterPluginsCMD.sh --generate-csv results_krakend.csv --input-jtl test_krakend.jtl --plugin-type AggregateReport;
     RESULTS_KRAKEND=$(<results_krakend.csv)
-    RESULTS_KRAKEND=$(sed -z "s/Dev\. /Dev.||/g" <<< $RESULTS_KRAKEND)
-    RESULTS_KRAKEND=$(sed -r "s/([0-9]) /\1||/g" <<< $RESULTS_KRAKEND)
+    RESULTS_KRAKEND=$(sed -z "s/Dev\.\s/Dev.||/g" <<< $RESULTS_KRAKEND)
+    RESULTS_KRAKEND=$(sed -r "s/([0-9])\s([a-zA-Z])/\1||\2/g" <<< $RESULTS_KRAKEND)
 else
     echo "NO KRAKEND CONFIG"
 fi
@@ -79,8 +79,8 @@ if [ ! -z "$TEST_FILE_TYK" ]; then
     sudo ./jmeter.sh -n -t test_tyk.jmx -l test_tyk.jtl;
     sudo ./JMeterPluginsCMD.sh --generate-csv results_tyk.csv --input-jtl test_tyk.jtl --plugin-type AggregateReport;
     RESULTS_TYK=$(<results_tyk.csv)
-    RESULTS_TYK=$(sed -z "s/Dev\. /Dev.||/g" <<< $RESULTS_TYK)
-    RESULTS_TYK=$(sed -r "s/([0-9]) /\1||/g" <<< $RESULTS_TYK)
+    RESULTS_TYK=$(sed -z "s/Dev\.\s/Dev.||/g" <<< $RESULTS_TYK)
+    RESULTS_TYK=$(sed -r "s/([0-9])\s([a-zA-Z])/\1||\2/g" <<< $RESULTS_TYK)
 else
     echo "NO TYK CONFIG"
 fi
