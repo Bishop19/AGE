@@ -22,7 +22,7 @@ sudo apt-get install -y unzip
 sudo apt install -y default-jdk
 
 # Install JMeter and plugins
-wget https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.4.1.tgz -O jmeter.tgz
+wget https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.4.1.tgz -O jmeter.tgz --no-check-certificate
 tar xzf jmeter.tgz
 
 cd apache-jmeter-5.4.1
