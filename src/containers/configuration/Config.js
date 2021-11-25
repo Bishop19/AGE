@@ -349,8 +349,8 @@ const Deploy = ({ config }) => {
             <Box>
               <Typography variant="h6">Danger Zone</Typography>
               <Typography paragraph color="textSecondary">
-                Once you delete this configuration, there is no going back.
-                Please be certain.
+                Once you delete the instances, there is no going back. Please be
+                certain.
               </Typography>
             </Box>
             <Button className={classes.dangerBackground} variant="contained">
@@ -546,7 +546,7 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
               >
                 <Typography variant="h6">Upload test file</Typography>
                 <Box pt={2}>
-                  <Grid container spacing={2}>
+                  <Grid container spacing={2} alignItems="center">
                     <Grid item xs={2}>
                       Name
                     </Grid>
@@ -588,7 +588,7 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
               </Box>
             )}
             <Box pt={4}>
-              <Grid container spacing={2}>
+              <Grid container spacing={2} alignItems="center">
                 <Grid item xs={2}>
                   Name
                 </Grid>
@@ -691,8 +691,13 @@ const Test = ({ config, onDeploy, onConfigChange }) => {
               </Grid>
             </Box>
 
-            <Box display="flex" justifyContent="flex-end" width="100%">
-              <Button disabled={!can_start} onClick={handleStartClick}>
+            <Box pt={2} display="flex" justifyContent="flex-end" width="100%">
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={!can_start}
+                onClick={handleStartClick}
+              >
                 Start
               </Button>
             </Box>

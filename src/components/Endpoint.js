@@ -6,6 +6,7 @@ import { Box, Typography } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 const Params = ({ name, params }) => {
+  console.log(Object.entries(params));
   return (
     <Box>
       <Box>
@@ -27,7 +28,7 @@ const Params = ({ name, params }) => {
         <ul>
           {Object.entries(params).map(([param, type], index) => (
             <li key={index}>
-              {param} - {type}
+              {param} - {type.type ? type.type : type}
             </li>
           ))}
         </ul>
@@ -47,6 +48,7 @@ const Endpoint = ({ endpoint }) => {
     query_params,
     body_params,
     security,
+    is_service,
   } = endpoint;
 
   const getBackgroundColor = () => {
@@ -90,7 +92,24 @@ const Endpoint = ({ endpoint }) => {
         onClick={handleClick}
         style={{ cursor: 'pointer' }}
       >
-        <Box flexGrow="1">{base_path + endpoint_path}</Box>
+        <Box flexGrow="1">
+          <Box display="flex">
+            <span>{endpoint_path}</span>
+            <Box
+              style={{
+                backgroundColor: '#b3b3b3',
+                color: 'white',
+                marginLeft: '10px',
+                fontSize: '0.7rem',
+                padding: '4px 6px',
+                borderRadius: '12px',
+              }}
+            >
+              {base_path}
+              {!is_service && endpoint_path}
+            </Box>
+          </Box>
+        </Box>
         {security != 'NONE' && (
           <Box mx={1} display="flex" alignItems="center">
             <LockOutlinedIcon color="action" />

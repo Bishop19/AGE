@@ -87,9 +87,9 @@ const GCP = ({
         Provide your service account (JSON file) and your region.
       </Typography>
       <form>
-        <Box display="flex" width="60%">
+        <Box display="flex">
           <Box display="flex" flexGrow={1}>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} alignItems="center">
               <Grid item xs={2}>
                 Name
               </Grid>

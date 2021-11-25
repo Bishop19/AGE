@@ -130,6 +130,7 @@ const Results = ({ results }) => {
               <TableCell>Name</TableCell>
               <TableCell>Config</TableCell>
               <TableCell>Gateway</TableCell>
+              <TableCell>Finish Date</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -142,6 +143,7 @@ const Results = ({ results }) => {
                 <TableCell>{result.name}</TableCell>
                 <TableCell>{result.config}</TableCell>
                 <TableCell>{parseGatewayName(result.gateway)}</TableCell>
+                <TableCell>{result.finish_date}</TableCell>
                 <TableCell>
                   <IconButton
                     to={`/configs/${result.config_id}`}
