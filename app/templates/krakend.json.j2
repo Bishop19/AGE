@@ -27,7 +27,7 @@
       {% endif %}
       "backend": [
         {
-          "url_pattern": "{{ endpoint.endpoint_path }}",
+          "url_pattern": "{{ endpoint.endpoint_path if not endpoint.is_service else '/'}}",
           "encoding": "no-op",
           "method": "{{ endpoint.method }}",
           "host": ["{{ endpoint.base_path }}"]

@@ -4,7 +4,7 @@ _transform: true
 services:
 {%- for endpoint in endpoints %}
 - name: {{ "endpoint-" }}{{ loop.index }}
-  url: {{ endpoint.base_path + endpoint.endpoint_path }}
+  url: {{ endpoint.base_path + endpoint.endpoint_path if not endpoint.is_service else endpoint.base_path + "/" }}
   routes:
   - name: {{ "route-" }}{{ loop.index }}
     methods:

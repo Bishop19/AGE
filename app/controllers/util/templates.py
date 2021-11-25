@@ -69,8 +69,14 @@ def generate_config_files(hosts):
 
     for host, first_path in hosts.items():
         for listen_path, endpoints in first_path.items():
+            is_service = bool(filter(lambda x: x.is_service, endpoints))
             files.append(
-                template.render(host=host, listen_path=listen_path, endpoints=endpoints)
+                template.render(
+                    host=host,
+                    listen_path=listen_path,
+                    endpoints=endpoints,
+                    is_service=is_service,
+                )
             )
 
     return files

@@ -76,6 +76,7 @@ def create_config():
                 path_params=endpoint_data.get("path_params", None),
                 body_params=endpoint_data.get("body_params", None),
                 security=endpoint_data.get("security", "NONE"),
+                is_service=endpoint_data.get("is_service", False),
             )
             config.endpoints.append(endpoint)
         except:

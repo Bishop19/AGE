@@ -7,7 +7,7 @@
     "use_cookie": false,
     "cookie_name": ""
   },
-    "use_keyless": true,
+  "use_keyless": true,
   "version_data": {
     "not_versioned": true,
     "versions": {
@@ -18,7 +18,7 @@
           "white_list": [
             {% for endpoint in endpoints %}
               {
-                  "path": "{{ endpoint.endpoint_path }}",
+                  "path": "{{ endpoint.endpoint_path if not endpoint.is_service else '/' }}",
                   "ignore_case": false,
                   "method_actions": {
                       "{{ endpoint.method.value }}": {
@@ -37,7 +37,7 @@
   },
   "proxy": {
     "listen_path": "{{ listen_path }}",
-    "target_url": "{{ host }}{{ listen_path }}",
+    "target_url": "{{ host }}{{ listen_path if not is_service }}",
     "strip_listen_path": true
   },
   "active": true
