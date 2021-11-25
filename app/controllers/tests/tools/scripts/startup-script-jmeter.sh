@@ -79,7 +79,7 @@ if [ ! -z "$TEST_FILE_TYK" ]; then
     sudo ./jmeter.sh -n -t test_tyk.jmx -l test_tyk.jtl;
     sudo ./JMeterPluginsCMD.sh --generate-csv results_tyk.csv --input-jtl test_tyk.jtl --plugin-type AggregateReport;
     RESULTS_TYK=$(<results_tyk.csv)
-    RESULTS_TYK=$(sed -z -E"s/Dev\.\s/Dev.||/g" <<< $RESULTS_TYK)
+    RESULTS_TYK=$(sed -z -E "s/Dev\.\s/Dev.||/g" <<< $RESULTS_TYK)
     RESULTS_TYK=$(sed -z -r "s/([0-9])\s([a-zA-Z])/\1||\2/g" <<< $RESULTS_TYK)
 else
     echo "NO TYK CONFIG"
