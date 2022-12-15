@@ -1,0 +1,48 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Service Aggregator",
+    "description": "Service Aggregator documentation.",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/google": {
+      "get": {
+        "description": "server only",
+        "servers": [
+          {
+            "url": "https://www.google.com/"
+          }
+        ],
+        "summary": "Google's HTML page",
+        "operationId": "google",
+        "responses": {
+          "200": {
+            "description": "Ok"
+          }
+        }
+      }
+    },
+    "/youtube": {
+      "get": {
+        "description": "server only",
+        "servers": [
+          {
+            "url": "https://www.youtube.com/"
+          }
+        ],
+        "summary": "Youtube's HTML page",
+        "operationId": "youtube",
+        "responses": {
+          "200": {
+            "description": "Ok"
+          }
+        }
+      }
+    }
+  }
+}

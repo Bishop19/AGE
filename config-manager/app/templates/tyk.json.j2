@@ -1,0 +1,44 @@
+{
+  "name": "Test API",
+  "auth": {
+    "auth_header_name": "Authorization",
+    "use_param": false,
+    "param_name": "",
+    "use_cookie": false,
+    "cookie_name": ""
+  },
+  "use_keyless": true,
+  "version_data": {
+    "not_versioned": true,
+    "versions": {
+      "Default": {
+        "name": "Default",
+        "use_extended_paths": true,
+        "extended_paths": {
+          "white_list": [
+            {% for endpoint in endpoints %}
+              {
+                  "path": "{{ endpoint.endpoint_path if not endpoint.is_service else '/' }}",
+                  "ignore_case": false,
+                  "method_actions": {
+                      "{{ endpoint.method.value }}": {
+                          "action": "no_action",
+                          "code": 200,
+                          "data": "",
+                          "headers": {}
+                      }
+                  }
+              }{% if not loop.last %},{% endif %}
+            {%- endfor %}
+          ]
+        }
+      }
+    }
+  },
+  "proxy": {
+    "listen_path": "{{ listen_path }}",
+    "target_url": "{{ host }}{{ listen_path if not is_service }}",
+    "strip_listen_path": true
+  },
+  "active": true
+}
