@@ -1,0 +1,10 @@
+.vscode
+.env
+.flaskenv
+*__pycache*
+app.db
+tests/app_test.db
+venv
+htmlcov
+.coverage
+gateways

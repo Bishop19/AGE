@@ -1,0 +1,22 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+{%- for endpoint in endpoints %}
+- name: {{ "endpoint-" }}{{ loop.index }}
+  url: {{ endpoint.base_path + endpoint.endpoint_path if not endpoint.is_service else endpoint.base_path + "/" }}
+  routes:
+  - name: {{ "route-" }}{{ loop.index }}
+    methods:
+    - {{ endpoint.method.value }}
+    paths:
+    - {{ endpoint.endpoint_path }}
+    {%- if endpoint.path_params|length != 0 %}
+    regex_priority: {{ endpoint.path_params|length }}
+    plugins:
+    - name: request-transformer
+      config:
+        replace:
+          uri: {{ endpoint.uri }}
+    {%- endif %}
+{%- endfor %}
